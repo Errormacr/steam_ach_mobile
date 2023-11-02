@@ -9,7 +9,7 @@ import '../dataModels/ach_data.dart' as ach_m;
 import '../dataModels/ach_perc_data.dart' as perc_m;
 import '../dataModels/ach_ico_data.dart' as icon_m;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class Api {
   Future<void> getUserData(int steamId, String lang) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
@@ -22,9 +22,8 @@ class Api {
     );
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    const apiKey =
-        'AD3D7C531860334E7FD0130A9CE64EE1'; // Replace with your API key
+    final secureStorage = FlutterSecureStorage();
+    String? apiKey = await secureStorage.read(key: "apiKey");
     final url =
         'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=$apiKey&ste'
         'amids=$steamId';
@@ -127,7 +126,7 @@ class Api {
       });
 
       final recentUrl =
-          "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=AD3D7C531860334E7FD0130A9CE64EE1&steamid=$steamId&format=json";
+          "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=$apiKey&steamid=$steamId&format=json";
       final recentRes = await http.get(Uri.parse(recentUrl));
       final rec = jsonDecode(recentRes.body).toString();
       db.insertUpdateAcc(Account(steamId, nickname, rec, numGames, achCount,
@@ -140,7 +139,8 @@ class Api {
   Future<bool> checkUpdate(int steamId) async {
     Methods db = Methods();
     Account? user = await db.getUserById(steamId);
-    String apiKey = "AD3D7C531860334E7FD0130A9CE64EE1";
+    final secureStorage = FlutterSecureStorage();
+    String? apiKey = await secureStorage.read(key: "apiKey");
     if (user != null) {
       final recentUrl =
           "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=$apiKey&steamid=$steamId&format=json";
