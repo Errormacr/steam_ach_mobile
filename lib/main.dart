@@ -121,7 +121,6 @@ class _MyHomePageState extends State<MyHomePage> {
             games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
             List<GameCard> gameCards = [];
             for (var i = 0; i < 6; i++) {
-              bool completed = games[i].percent == 100.0;
               String gameImageUrl =
                   "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/capsule_sm_120.jpg";
               List<classes.Achievement> ach = games[i].achievements!;
@@ -133,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
               gameCards.add(GameCard(
                 gameImageUrl: gameImageUrl,
                 gameName: gameName,
-                isCompleted: completed,
+                isCompleted: gainedCount == achCount,
                 achievementCount: achCount,
                 gainedCount: gainedCount,
               ));
