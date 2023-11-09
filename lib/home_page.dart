@@ -10,7 +10,6 @@ class HomePage extends StatelessWidget {
   final double widthHeight = 100;
   final int? id;
   final List<GameCard>? recent;
-
   const HomePage({
     Key? key,
     this.nickname,
@@ -23,6 +22,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+  print(recent?.length);
+
     return Center(
       child: Wrap(
         direction: Axis.vertical,
@@ -78,7 +79,7 @@ class HomePage extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 250,
+            height: 330,
             width: 390,
             child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(

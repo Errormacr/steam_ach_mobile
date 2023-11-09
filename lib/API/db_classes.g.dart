@@ -1245,18 +1245,23 @@ const GameSchema = Schema(
       name: r'imgIconUrl',
       type: IsarType.string,
     ),
-    r'name': PropertySchema(
+    r'lastPlayTime': PropertySchema(
       id: 3,
+      name: r'lastPlayTime',
+      type: IsarType.long,
+    ),
+    r'name': PropertySchema(
+      id: 4,
       name: r'name',
       type: IsarType.string,
     ),
     r'percent': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'percent',
       type: IsarType.double,
     ),
     r'playtimeForever': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'playtimeForever',
       type: IsarType.long,
     )
@@ -1316,9 +1321,10 @@ void _gameSerialize(
   );
   writer.writeLong(offsets[1], object.appid);
   writer.writeString(offsets[2], object.imgIconUrl);
-  writer.writeString(offsets[3], object.name);
-  writer.writeDouble(offsets[4], object.percent);
-  writer.writeLong(offsets[5], object.playtimeForever);
+  writer.writeLong(offsets[3], object.lastPlayTime);
+  writer.writeString(offsets[4], object.name);
+  writer.writeDouble(offsets[5], object.percent);
+  writer.writeLong(offsets[6], object.playtimeForever);
 }
 
 Game _gameDeserialize(
@@ -1336,9 +1342,10 @@ Game _gameDeserialize(
   );
   object.appid = reader.readLongOrNull(offsets[1]);
   object.imgIconUrl = reader.readStringOrNull(offsets[2]);
-  object.name = reader.readStringOrNull(offsets[3]);
-  object.percent = reader.readDoubleOrNull(offsets[4]);
-  object.playtimeForever = reader.readLongOrNull(offsets[5]);
+  object.lastPlayTime = reader.readLongOrNull(offsets[3]);
+  object.name = reader.readStringOrNull(offsets[4]);
+  object.percent = reader.readDoubleOrNull(offsets[5]);
+  object.playtimeForever = reader.readLongOrNull(offsets[6]);
   return object;
 }
 
@@ -1361,10 +1368,12 @@ P _gameDeserializeProp<P>(
     case 2:
       return (reader.readStringOrNull(offset)) as P;
     case 3:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 4:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 5:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 6:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1682,6 +1691,75 @@ extension GameQueryFilter on QueryBuilder<Game, Game, QFilterCondition> {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'imgIconUrl',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Game, Game, QAfterFilterCondition> lastPlayTimeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'lastPlayTime',
+      ));
+    });
+  }
+
+  QueryBuilder<Game, Game, QAfterFilterCondition> lastPlayTimeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'lastPlayTime',
+      ));
+    });
+  }
+
+  QueryBuilder<Game, Game, QAfterFilterCondition> lastPlayTimeEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'lastPlayTime',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Game, Game, QAfterFilterCondition> lastPlayTimeGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'lastPlayTime',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Game, Game, QAfterFilterCondition> lastPlayTimeLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'lastPlayTime',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Game, Game, QAfterFilterCondition> lastPlayTimeBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'lastPlayTime',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }

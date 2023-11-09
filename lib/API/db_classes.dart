@@ -24,6 +24,7 @@ class Game {
   int? playtimeForever;
   String? imgIconUrl;
   double? percent;
+  int? lastPlayTime;  
   List<Achievement>? achievements;
 }
 

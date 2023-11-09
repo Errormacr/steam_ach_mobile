@@ -70,6 +70,7 @@ Future<void> fetchData(BuildContext context) async {
     }
   }
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -106,6 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   initState() {
+    
     super.initState();
     Api api = Api();
     fetchData(context);
@@ -116,28 +118,27 @@ class _MyHomePageState extends State<MyHomePage> {
           Methods db = Methods();
           classes.Account? user = await db.getUserById(steamId);
           if (user != null) {
-            List<GameCard> cards = [];
-            List<String> parts = user.recent.split(RegExp(r'[,:{}]'));
-            var games = user.games;
-            for (var i = 0; i < parts.length; i++) {
-              if (parts[i].trim() == 'appid') {
-                var game = games.firstWhere(
-                    (game) => game.appid == int.parse(parts[i + 1].trim()));
-                bool completed = game.percent == 100.0;
-                cards.add(GameCard(
-                    gameImageUrl:
-                        "https://steamcdn-a.akamaihd.net/steam/apps/${parts[i + 1].trim()}/capsule_sm_120.jpg",
-                    gameName: parts[i + 3],
-                    isCompleted: completed));
-              }
+            List<classes.Game> games = user.games;
+            games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
+            List<GameCard> gameCards = [];
+            for (var i = 0; i < 6; i++) {
+              bool completed = games[i].percent == 100.0;
+              String gameImageUrl =
+                  "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/capsule_sm_120.jpg";
+              String gameName = games[i].name!.trim();
+              gameCards.add(GameCard(
+                  gameImageUrl: gameImageUrl,
+                  gameName: gameName,
+                  isCompleted: completed));
             }
+
             setState(() {
               avatarUrl = user.avaUrl;
               nickname = user.username;
               numGames = user.gameCount;
               percent = user.percentage;
               id = steamId;
-              cards = cards;
+              cards = gameCards;
             });
           }
         });
@@ -145,28 +146,27 @@ class _MyHomePageState extends State<MyHomePage> {
         Methods db = Methods();
         db.getUserById(steamId).then((user) async {
           if (user != null) {
-            List<GameCard> cards0 = [];
-            List<String> parts = user.recent.split(RegExp(r'[,:{}]'));
-            var games = user.games;
-            for (var i = 0; i < parts.length; i++) {
-              if (parts[i].trim() == 'appid') {
-                var game = games.firstWhere(
-                    (game) => game.appid == int.parse(parts[i + 1].trim()));
-                bool completed = game.percent == 100.0;
-                cards0.add(GameCard(
-                    gameImageUrl:
-                        "https://steamcdn-a.akamaihd.net/steam/apps/${parts[i + 1].trim()}/capsule_sm_120.jpg",
-                    gameName: parts[i + 3],
-                    isCompleted: completed));
-              }
+            List<classes.Game> games = user.games;
+            games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
+            List<GameCard> gameCards = [];
+            for (var i = 0; i < 6; i++) {
+              bool completed = games[i].percent == 100.0;
+              String gameImageUrl =
+                  "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/capsule_sm_120.jpg";
+              String gameName = games[i].name!.trim();
+              gameCards.add(GameCard(
+                  gameImageUrl: gameImageUrl,
+                  gameName: gameName,
+                  isCompleted: completed)); 
             }
+
             setState(() {
               avatarUrl = user.avaUrl;
               nickname = user.username;
               numGames = user.gameCount;
               percent = user.percentage;
               id = steamId;
-              cards = cards0;
+              cards = gameCards;
             });
           }
         });

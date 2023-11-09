@@ -105,7 +105,7 @@ class Api {
               gameWithAch++;
             }
             updatetgame.add(game.appid);
-            await _updateNotification(
+            _updateNotification(
                 updatetgame.length, gameData.response.games.length);
           } else {
             updatetgame.add(game.appid);
@@ -116,9 +116,10 @@ class Api {
             ..playtimeForever = game.playtimeForever
             ..imgIconUrl = game.imgIconUrl
             ..percent = achievements.isEmpty ? 0 : achievedAch.length / totalAch
+            ..lastPlayTime = game.rtimeLastPlayed
             ..achievements = achievements);
         });
-        await _updateNotification(100, 100);
+        _updateNotification(100, 100);
         final recentUrl =
             "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=$apiKey&steamid=$steamId&format=json";
         final recentRes = await http.get(Uri.parse(recentUrl));
