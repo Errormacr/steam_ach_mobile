@@ -79,11 +79,11 @@ class HomePage extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 330,
+            height: 365,
             width: 390,
             child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  mainAxisExtent: 75,
+                  mainAxisExtent: 115,
                   maxCrossAxisExtent: 200, // максимальная ширина элемента
                   crossAxisSpacing: 4, // расстояние между столбцами
                   mainAxisSpacing: 10, // расстояние между строками

@@ -107,7 +107,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   initState() {
-    
     super.initState();
     Api api = Api();
     fetchData(context);
@@ -125,11 +124,19 @@ class _MyHomePageState extends State<MyHomePage> {
               bool completed = games[i].percent == 100.0;
               String gameImageUrl =
                   "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/capsule_sm_120.jpg";
+              List<classes.Achievement> ach = games[i].achievements!;
+              int achCount = ach.length;
+              Iterable<classes.Achievement> achi =
+                  ach.where((element) => element.achieved);
+              int gainedCount = achi.length;
               String gameName = games[i].name!.trim();
               gameCards.add(GameCard(
-                  gameImageUrl: gameImageUrl,
-                  gameName: gameName,
-                  isCompleted: completed));
+                gameImageUrl: gameImageUrl,
+                gameName: gameName,
+                isCompleted: completed,
+                achievementCount: achCount,
+                gainedCount: gainedCount,
+              ));
             }
 
             setState(() {
@@ -154,10 +161,18 @@ class _MyHomePageState extends State<MyHomePage> {
               String gameImageUrl =
                   "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/capsule_sm_120.jpg";
               String gameName = games[i].name!.trim();
+              List<classes.Achievement> ach = games[i].achievements!;
+              int achCount = ach.length;
+              Iterable<classes.Achievement> achi =
+                  ach.where((element) => element.achieved);
+              int gainedCount = achi.length;
               gameCards.add(GameCard(
-                  gameImageUrl: gameImageUrl,
-                  gameName: gameName,
-                  isCompleted: completed)); 
+                gameImageUrl: gameImageUrl,
+                gameName: gameName,
+                isCompleted: completed,
+                achievementCount: achCount,
+                gainedCount: gainedCount,
+              ));
             }
 
             setState(() {

@@ -4,33 +4,33 @@ class GameCard extends StatelessWidget {
   final String gameImageUrl;
   final String gameName;
   final bool isCompleted;
+  final int achievementCount;
+  final int gainedCount;
 
   const GameCard({
     Key? key,
     required this.gameImageUrl,
     required this.gameName,
     this.isCompleted = false,
+    required this.achievementCount,
+    required this.gainedCount,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 130,
-      height: 50,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
       ),
       child: Stack(
-        
         children: [
-         
           if (isCompleted)
             Positioned.fill(
               left: 0,
               top: 0,
               child: Container(
                 width: 190,
-                height: 70,
+                height: 90,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(0),
                   border: Border.all(color: const Color.fromARGB(255, 255, 255, 0)),
@@ -43,8 +43,10 @@ class GameCard extends StatelessWidget {
                 ),
               ),
             ),
-             Align(
-            alignment: Alignment.center,
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
             child: Image.network(
               gameImageUrl,
               height: 70,
@@ -52,11 +54,37 @@ class GameCard extends StatelessWidget {
             ),
           ),
           Positioned(
-            bottom: 0,
+            bottom: 35,
+            left: 0,
+            right: 0,
+            child: LinearProgressIndicator(
+              value: gainedCount / achievementCount, // Assuming achievement count is out of 100
+              backgroundColor: Colors.grey,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+            ),
+          ),
+          Positioned(
+            bottom: 15,
             left: 0,
             child: Text(
               gameName,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: Text(
+              '$achievementCount',
+              style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+            ),
+          ),
+           Positioned(
+            bottom: 0,
+            left: 0,
+            child: Text(
+              '$gainedCount',
+              style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
             ),
           ),
         ],
