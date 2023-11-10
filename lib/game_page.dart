@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:steam_ach_mobile/API/db_methods.dart' as db_method;
-import 'game_card.dart';
+import 'widgets/game_card.dart';
 import "API/db_classes.dart" as classes;
 
 class GamePage extends StatefulWidget {

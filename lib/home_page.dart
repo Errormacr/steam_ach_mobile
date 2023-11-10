@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:steam_ach_mobile/game_card.dart';
-import 'two_rad.dart';
+import 'package:steam_ach_mobile/widgets/game_card.dart';
+import 'widgets/two_rad.dart';
 
 class HomePage extends StatelessWidget {
   final String? nickname;
@@ -22,7 +22,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  print(recent?.length);
 
     return Center(
       child: Wrap(

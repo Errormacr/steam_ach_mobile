@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:http/http.dart' as http;
-import 'package:steam_ach_mobile/API/db_classes.dart';
-import 'package:steam_ach_mobile/notifications.dart';
+import 'package:steam_ach_mobile/API/db_classes.dart' as classes;
+import 'package:steam_ach_mobile/widgets/notifications.dart';
 import 'dart:convert';
 import './db_methods.dart';
 import '../dataModels/player_data.dart';
@@ -10,13 +12,128 @@ import '../dataModels/ach_perc_data.dart' as perc_m;
 import '../dataModels/ach_ico_data.dart' as icon_m;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/foundation.dart';
+
+typedef GameDatarequest = ({gm.GameData gameDataSplit});
+
+Future<http.Response> fetchData(String url) {
+  return http.get(Uri.parse(url));
+}
+
+class readyIsol {
+  List<classes.Game> games;
+  int achCount;
+  double percents;
+  int gameWithAch;
+  readyIsol({
+    required this.games,
+    required this.achCount,
+    required this.percents,
+    required this.gameWithAch,
+  });
+}
+
+Future<readyIsol> getGameData(
+    (
+      List<gm.Game> splitedGame,
+      String apiKey,
+      int steamId,
+      String lang
+    ) data) async {
+  int achCount = 0;
+  double percents = 0;
+  int gameWithAch = 0;
+  List<int> updatetgame = [];
+  List<classes.Game> games = [];
+  await Future.forEach(data.$1, (game) async {
+    final achievements = <classes.Achievement>[];
+    final achUrl =
+        "http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${game.appid}&key=${data.$2}&steamid=${data.$3}&l=${data.$4}";
+    final percUrl =
+        "http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=${game.appid}&format=json";
+    final icoUrl =
+        "https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${game.appid}&key=${data.$2}&l=${data.$4}";
+
+    final responsesAch = await Future.wait([
+      http.get(Uri.parse(achUrl)),
+      http.get(Uri.parse(percUrl)),
+      http.get(Uri.parse(icoUrl)),
+    ]);
+
+    final achResp = responsesAch[0];
+    final perResp = responsesAch[1];
+    final icoResp = responsesAch[2];
+    int totalAch = 0;
+    Iterable<classes.Achievement> achievedAch = [];
+    if (jsonDecode(achResp.body).toString() !=
+            "{playerstats: {error: Requested app has no stats, success: false}}" &&
+        jsonDecode(achResp.body).toString().contains("achievements")) {
+      final achRes = ach_m.AchData.fromJson(jsonDecode(achResp.body));
+      final percRes = perc_m.PercData.fromJson(jsonDecode(perResp.body));
+      final icoRes = icon_m.IconData.fromJson(jsonDecode(icoResp.body));
+
+      for (var item in achRes.playerstats.achievements) {
+        perc_m.Achievement matchingItem;
+        try {
+          matchingItem = percRes.achievementpercentages.achievements
+              .firstWhere((element) => element.name == item.apiname);
+        } catch (e) {
+          matchingItem =
+              perc_m.Achievement.fromJson({"name": "", "percent": 1});
+        }
+
+        final matchingItem2 = icoRes.game.availableGameStats.achievements
+            .firstWhere((element) => element.name == item.apiname);
+
+        achievements.add(classes.Achievement()
+          ..name = item.name
+          ..displayName = matchingItem2.displayName
+          ..description = matchingItem2.description
+          ..icon = matchingItem2.icon
+          ..icongray = matchingItem2.icongray
+          ..achieved = item.achieved == 1 ? true : false
+          ..percentage = matchingItem.percent);
+      }
+      totalAch = achievements.length;
+      if (totalAch > 0) {
+        achCount += totalAch;
+      }
+      achievedAch = achievements.where((item) => item.achieved == true);
+      if (achievedAch.isNotEmpty) {
+        percents += achievedAch.length / totalAch;
+        gameWithAch++;
+      }
+      updatetgame.add(game.appid);
+    } else {
+      updatetgame.add(game.appid);
+    }
+    
+    games.add(classes.Game()
+      ..appid = game.appid
+      ..name = game.name
+      ..playtimeForever = game.playtimeForever
+      ..imgIconUrl = game.imgIconUrl
+      ..percent = achievements.isEmpty ? 0 : achievedAch.length / totalAch
+      ..lastPlayTime = game.rtimeLastPlayed
+      ..achievements = achievements);
+  });
+
+  return readyIsol(
+      games: games,
+      achCount: achCount,
+      percents: percents,
+      gameWithAch: gameWithAch);
+}
 
 class Api {
-  Future<Account?> getUserData(int steamId, String lang) async {
+  final String apiKey;
+
+  Api({required this.apiKey});
+
+  Future<classes.Account?> getUserData(int steamId, String lang) async {
     try {
-      const secureStorage = FlutterSecureStorage();
-      String? apiKey = await secureStorage.read(key: "apiKey");
-      print(apiKey);
+      // const secureStorage = FlutterSecureStorage();
+      // String? apiKey = await secureStorage.read(key: "apiKey");
       final url =
           'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=$apiKey&ste'
           'amids=$steamId';
@@ -25,15 +142,15 @@ class Api {
           'mid=$steamId&format=json&include_played_free_games=true&include_appinfo=true';
 
       final responses = await Future.wait([
-        http.get(Uri.parse(url)),
-        http.get(Uri.parse(gamesUrl)),
+        compute(fetchData, url),
+        compute(fetchData, gamesUrl),
       ]);
       final response = responses[0];
       final gameResponse = responses[1];
-      var achCount = 0;
       double percents = 0;
       var gameWithAch = 0;
       if (response.statusCode == 200) {
+        var achCount = 0;
         Methods db = Methods();
         gm.GameData gameData =
             gm.GameData.fromJson(jsonDecode(gameResponse.body));
@@ -41,101 +158,52 @@ class Api {
         final avatarUrl = userData.response.players[0].avatarfull;
         final nickname = userData.response.players[0].personaname;
         final numGames = gameData.response.gameCount;
-        final List<Game> games = <Game>[];
+        List<classes.Game> games = <classes.Game>[];
 
         await _showNotification("Обновление", "Обновление...");
 
         List<int> updatetgame = [];
-        await Future.forEach(gameData.response.games, (game) async {
-          final achievements = <Achievement>[];
-          final achUrl =
-              "http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${game.appid}&key=$apiKey&steamid=$steamId&l=$lang";
-          final percUrl =
-              "http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=${game.appid}&format=json";
-          final icoUrl =
-              "https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${game.appid}&key=$apiKey&l=$lang";
-
-          final responsesAch = await Future.wait([
-            http.get(Uri.parse(achUrl)),
-            http.get(Uri.parse(percUrl)),
-            http.get(Uri.parse(icoUrl)),
-          ]);
-
-          final achResp = responsesAch[0];
-          final perResp = responsesAch[1];
-          final icoResp = responsesAch[2];
-          int totalAch = 0;
-          Iterable<Achievement> achievedAch = [];
-          if (jsonDecode(achResp.body).toString() !=
-                  "{playerstats: {error: Requested app has no stats, success: false}}" &&
-              jsonDecode(achResp.body).toString().contains("achievements")) {
-            final achRes = ach_m.AchData.fromJson(jsonDecode(achResp.body));
-            final percRes = perc_m.PercData.fromJson(jsonDecode(perResp.body));
-            final icoRes = icon_m.IconData.fromJson(jsonDecode(icoResp.body));
-
-            for (var item in achRes.playerstats.achievements) {
-              perc_m.Achievement matchingItem;
-              try {
-                matchingItem = percRes.achievementpercentages.achievements
-                    .firstWhere((element) => element.name == item.apiname);
-              } catch (e) {
-                matchingItem =
-                    perc_m.Achievement.fromJson({"name": "", "percent": 1});
-              }
-
-              final matchingItem2 = icoRes.game.availableGameStats.achievements
-                  .firstWhere((element) => element.name == item.apiname);
-
-              achievements.add(Achievement()
-                ..name = item.name
-                ..displayName = matchingItem2.displayName
-                ..description = matchingItem2.description
-                ..icon = matchingItem2.icon
-                ..icongray = matchingItem2.icongray
-                ..achieved = item.achieved == 1 ? true : false
-                ..percentage = matchingItem.percent);
-            }
-            totalAch = achievements.length;
-            if (totalAch > 0) {
-              achCount += totalAch;
-            }
-            achievedAch = achievements.where((item) => item.achieved == true);
-            if (achievedAch.isNotEmpty) {
-              percents += achievedAch.length / totalAch;
-              gameWithAch++;
-            }
-            updatetgame.add(game.appid);
-            _updateNotification(
-                updatetgame.length, gameData.response.games.length);
-          } else {
-            updatetgame.add(game.appid);
-          }
-          games.add(Game()
-            ..appid = game.appid
-            ..name = game.name
-            ..playtimeForever = game.playtimeForever
-            ..imgIconUrl = game.imgIconUrl
-            ..percent = achievements.isEmpty ? 0 : achievedAch.length / totalAch
-            ..lastPlayTime = game.rtimeLastPlayed
-            ..achievements = achievements);
-        });
+        int splitter = numGames ~/ 6;
+        List<gm.Game> game1 = gameData.response.games.sublist(0, splitter);
+        List<gm.Game> game2 =
+            gameData.response.games.sublist(splitter, splitter * 2);
+        List<gm.Game> game3 =
+            gameData.response.games.sublist(splitter * 2, splitter * 3);
+        List<gm.Game> game4 =
+            gameData.response.games.sublist(splitter * 3, splitter * 4);
+        List<gm.Game> game5 =
+            gameData.response.games.sublist(splitter * 4, splitter * 5);
+        List<gm.Game> game6 =
+            gameData.response.games.sublist(splitter * 5, numGames);
+        var dataReady = await Future.wait([
+          compute(getGameData, (game1, apiKey, steamId, lang)),
+          compute(getGameData, (game2, apiKey, steamId, lang)),
+          compute(getGameData, (game3, apiKey, steamId, lang)),
+          compute(getGameData, (game4, apiKey, steamId, lang)),
+          compute(getGameData, (game5, apiKey, steamId, lang)),
+          compute(getGameData, (game6, apiKey, steamId, lang)),
+        ]);
+        for (int i = 0; i < 4; i++) {
+          games += dataReady[i].games;
+          achCount += dataReady[i].achCount;
+          percents += dataReady[i].percents;
+          gameWithAch += dataReady[i].gameWithAch;
+        }
         _updateNotification(100, 100);
         final recentUrl =
             "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=$apiKey&steamid=$steamId&format=json";
         final recentRes = await http.get(Uri.parse(recentUrl));
         final rec = jsonDecode(recentRes.body).toString();
-        db.insertUpdateAcc(Account(steamId, nickname, rec, numGames, achCount,
-            percents / gameWithAch * 100, avatarUrl, games));
-        return Account(steamId, nickname, rec, numGames, achCount,
+        db.insertUpdateAcc(classes.Account(steamId, nickname, rec, numGames,
+            achCount, percents / gameWithAch * 100, avatarUrl, games));
+        return classes.Account(steamId, nickname, rec, numGames, achCount,
             percents / gameWithAch * 100, avatarUrl, games);
       } else {
         throw Exception('Failed to load Steam avatar');
-        
       }
     } catch (e) {
-      print(e);
     }
-    return null;
+    return null; // compute
   }
 
   Future<void> _showNotification(String title, String body) async {
@@ -186,7 +254,7 @@ class Api {
 
   Future<bool> checkUpdate(int steamId) async {
     Methods db = Methods();
-    Account? user = await db.getUserById(steamId);
+    classes.Account? user = await db.getUserById(steamId);
     const secureStorage = FlutterSecureStorage();
     String? apiKey = await secureStorage.read(key: "apiKey");
     if (apiKey == null) {
