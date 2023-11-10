@@ -123,12 +123,20 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String? avatarUrl;
+  List<GameCard>? cards;
+  int id = 0;
   String? nickname;
   int? numGames;
   double? percent;
+
   int _currentIndex = 0;
-  int id = 0;
-  List<GameCard>? cards;
+
+  @override
+  initState() {
+    super.initState();
+    reinit();
+  }
+
   void reinit() {
     const secureStorage = FlutterSecureStorage();
     secureStorage.read(key: "apiKey").then((apiKey) {
@@ -137,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
         secureStorage.read(key: "steamId").then((value) {
           int steamId = int.tryParse(value!)!;
           api.checkUpdate(steamId).then((url) {
-            if (url) {
+            if (!url) {
               api.getUserData(steamId, "Russian").then((ele) async {
                 classes.Account? user = ele;
                 if (user != null) {
@@ -178,28 +186,29 @@ class _MyHomePageState extends State<MyHomePage> {
               Methods db = Methods();
               db.getUserById(steamId).then((user) async {
                 if (user != null) {
-                  List<classes.Game> games = user.games;
+                 List<classes.Game> games = user.games;
                   games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
                   List<GameCard> gameCards = [];
                   for (var i = 0; i < 6; i++) {
                     String gameImageUrl =
                         "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/header.jpg";
-                    String gameName = games[i].name!.trim();
                     List<classes.Achievement> ach = games[i].achievements!;
                     int achCount = ach.length;
                     Iterable<classes.Achievement> achi =
                         ach.where((element) => element.achieved);
                     int gainedCount = achi.length;
+                    String gameName = games[i].name!.trim();
                     gameCards.add(GameCard(
                       gameImageUrl: gameImageUrl,
                       gameName: gameName,
-                      isCompleted: achCount == gainedCount,
+                      isCompleted: gainedCount == achCount,
                       achievementCount: achCount,
                       gainedCount: gainedCount,
                       playtime: games[i].playtimeForever!,
                       lastPlayTime: games[i].lastPlayTime!,
                     ));
                   }
+
 
                   setState(() {
                     avatarUrl = user.avaUrl;
@@ -216,12 +225,6 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       });
     });
-  }
-
-  @override
-  initState() {
-    super.initState();
-    reinit();
   }
 
   @override

@@ -64,8 +64,8 @@ class _GamePageState extends State<GamePage> {
         switch (selectedFilter) {
           case 'Game Time':
             cards.sort((a, b) => selectNapr == 'Ascending'
-                    ? a.playtime.compareTo(b.playtime)
-                    : b.playtime.compareTo(a.playtime));
+                ? a.playtime.compareTo(b.playtime)
+                : b.playtime.compareTo(a.playtime));
             break;
           case 'Achievement Percentage':
             cards.sort((a, b) {
@@ -75,7 +75,7 @@ class _GamePageState extends State<GamePage> {
               double ratioB = b.achievementCount != 0
                   ? b.gainedCount / b.achievementCount
                   : 0;
-                if (a.achievementCount == 0) {
+              if (a.achievementCount == 0) {
                 return 1;
               } else if (b.achievementCount == 0) {
                 return -1;
@@ -168,24 +168,30 @@ class _GamePageState extends State<GamePage> {
                 );
               }).toList(),
             ),
-            DropdownButton<String>(
-              value: selectNapr,
-              onChanged: (String? newValue) {
+            ElevatedButton(
+              onPressed: () {
                 setState(() {
-                  selectNapr = newValue!;
+                  selectNapr = selectNapr == "Ascending" ? "dec" : "Ascending";
                 });
                 sorting();
               },
-              items: <String>[
-                'Ascending',
-                'Descending',
-              ].map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
+              style: ElevatedButton.styleFrom(
+                
+                primary: Colors.blue,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(
+                    selectNapr == "Ascending"
+                        ? Icons.arrow_upward
+                        : Icons.arrow_downward,
+                    size: 20,
+                  ),
+                ],
+              ),
+            )
           ],
         ),
         Expanded(

@@ -21,16 +21,17 @@ Future<http.Response> fetchData(String url) {
 }
 
 class readyIsol {
-  List<classes.Game> games;
-  int achCount;
-  double percents;
-  int gameWithAch;
   readyIsol({
     required this.games,
     required this.achCount,
     required this.percents,
     required this.gameWithAch,
   });
+
+  int achCount;
+  int gameWithAch;
+  List<classes.Game> games;
+  double percents;
 }
 
 Future<readyIsol> getGameData(
@@ -126,9 +127,9 @@ Future<readyIsol> getGameData(
 }
 
 class Api {
-  final String apiKey;
-
   Api({required this.apiKey});
+
+  final String apiKey;
 
   Future<classes.Account?> getUserData(int steamId, String lang) async {
     try {
@@ -183,7 +184,7 @@ class Api {
           compute(getGameData, (game5, apiKey, steamId, lang)),
           compute(getGameData, (game6, apiKey, steamId, lang)),
         ]);
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 6; i++) {
           games += dataReady[i].games;
           achCount += dataReady[i].achCount;
           percents += dataReady[i].percents;
@@ -204,6 +205,49 @@ class Api {
     } catch (e) {
     }
     return null; // compute
+  }
+
+  Future<bool> checkUpdate(int steamId) async {
+    Methods db = Methods();
+    classes.Account? user = await db.getUserById(steamId);
+    const secureStorage = FlutterSecureStorage();
+    String? apiKey = await secureStorage.read(key: "apiKey");
+    if (apiKey == null) {
+      return false;
+    }
+    if (user != null) {
+      final recentUrl =
+          "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=$apiKey&steamid=$steamId&format=json";
+      final recentRes = await http.get(Uri.parse(recentUrl));
+      final rec = jsonDecode(recentRes.body).toString();
+
+      List<String> parts1 = rec.split(RegExp(r'[,:{}]'));
+      List<String> parts = user.recent.split(RegExp(r'[,:{}]'));
+
+      List<String> playtimeForeverValues1 = [];
+
+      for (var i = 0; i < parts1.length; i++) {
+        if (parts1[i].trim() == 'playtime_forever') {
+          playtimeForeverValues1.add(parts1[i + 1].trim());
+        }
+      }
+      List<String> playtimeForeverValues = [];
+
+      for (var i = 0; i < parts.length; i++) {
+        if (parts[i].trim() == 'playtime_forever') {
+          playtimeForeverValues.add(parts[i + 1].trim());
+        }
+      }
+      if (playtimeForeverValues1.length == playtimeForeverValues.length) {
+        for (var i = 0; i < playtimeForeverValues.length; i++) {
+          if (playtimeForeverValues[i] != playtimeForeverValues1[i]) {
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+    return false;
   }
 
   Future<void> _showNotification(String title, String body) async {
@@ -250,48 +294,5 @@ class Api {
       platformChannelSpecifics,
       payload: 'item x',
     );
-  }
-
-  Future<bool> checkUpdate(int steamId) async {
-    Methods db = Methods();
-    classes.Account? user = await db.getUserById(steamId);
-    const secureStorage = FlutterSecureStorage();
-    String? apiKey = await secureStorage.read(key: "apiKey");
-    if (apiKey == null) {
-      return false;
-    }
-    if (user != null) {
-      final recentUrl =
-          "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=$apiKey&steamid=$steamId&format=json";
-      final recentRes = await http.get(Uri.parse(recentUrl));
-      final rec = jsonDecode(recentRes.body).toString();
-
-      List<String> parts1 = rec.split(RegExp(r'[,:{}]'));
-      List<String> parts = user.recent.split(RegExp(r'[,:{}]'));
-
-      List<String> playtimeForeverValues1 = [];
-
-      for (var i = 0; i < parts1.length; i++) {
-        if (parts1[i].trim() == 'playtime_forever') {
-          playtimeForeverValues1.add(parts1[i + 1].trim());
-        }
-      }
-      List<String> playtimeForeverValues = [];
-
-      for (var i = 0; i < parts.length; i++) {
-        if (parts[i].trim() == 'playtime_forever') {
-          playtimeForeverValues.add(parts[i + 1].trim());
-        }
-      }
-      if (playtimeForeverValues1.length == playtimeForeverValues.length) {
-        for (var i = 0; i < playtimeForeverValues.length; i++) {
-          if (playtimeForeverValues[i] != playtimeForeverValues1[i]) {
-            return false;
-          }
-        }
-        return true;
-      }
-    }
-    return false;
   }
 }
