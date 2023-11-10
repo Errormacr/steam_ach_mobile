@@ -12,7 +12,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Api {
-  Future<void> getUserData(int steamId, String lang) async {
+  Future<Account?> getUserData(int steamId, String lang) async {
     try {
       const secureStorage = FlutterSecureStorage();
       String? apiKey = await secureStorage.read(key: "apiKey");
@@ -126,8 +126,11 @@ class Api {
         final rec = jsonDecode(recentRes.body).toString();
         db.insertUpdateAcc(Account(steamId, nickname, rec, numGames, achCount,
             percents / gameWithAch * 100, avatarUrl, games));
+        return Account(steamId, nickname, rec, numGames, achCount,
+            percents / gameWithAch * 100, avatarUrl, games);
       } else {
         throw Exception('Failed to load Steam avatar');
+        
       }
     } catch (e) {
       print(e);

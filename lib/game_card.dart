@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class GameCard extends StatelessWidget {
   final String gameImageUrl;
@@ -51,8 +52,11 @@ class GameCard extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            child: Image.network(
-              gameImageUrl,
+            child: CachedNetworkImage(
+              imageUrl:gameImageUrl,
+              placeholder: (context,url)=> CircularProgressIndicator() ,
+              errorWidget: (context,url,error)=> Image.asset('assets/image/noimg.jpg') ,
+              width: 150,
               height: 70,
               fit: BoxFit.contain,
             ),
