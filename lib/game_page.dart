@@ -11,7 +11,8 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  String selectedFilter = 'Game Time'; // Default filter
+  String selectedFilter = 'Game Time';
+  String selectNapr = "Descending"; // Default filter
   List<GameCard> cards = [];
   db_method.Methods db = db_method.Methods();
 
@@ -38,7 +39,6 @@ class _GamePageState extends State<GamePage> {
             gainedCount = 0;
             achCount = 0;
           }
-          print(parsedAchCount);
           gameCards.add(GameCard(
             gameImageUrl: gameImageUrl,
             gameName: gameName,
@@ -59,6 +59,87 @@ class _GamePageState extends State<GamePage> {
 
   @override
   Widget build(BuildContext context) {
+    void sorting() {
+      setState(() {
+        switch (selectedFilter) {
+          case 'Game Time':
+            cards.sort((a, b) => selectNapr == 'Ascending'
+                    ? a.playtime.compareTo(b.playtime)
+                    : b.playtime.compareTo(a.playtime));
+            break;
+          case 'Achievement Percentage':
+            cards.sort((a, b) {
+              double ratioA = a.achievementCount != 0
+                  ? a.gainedCount / a.achievementCount
+                  : 0;
+              double ratioB = b.achievementCount != 0
+                  ? b.gainedCount / b.achievementCount
+                  : 0;
+                if (a.achievementCount == 0) {
+                return 1;
+              } else if (b.achievementCount == 0) {
+                return -1;
+              } else {
+                return selectNapr == 'Ascending'
+                    ? ratioA.compareTo(ratioB)
+                    : ratioB.compareTo(ratioA);
+              }
+            });
+            break;
+          case 'Total Achievements':
+            cards.sort((a, b) {
+              if (a.achievementCount == 0) {
+                return 1;
+              } else if (b.achievementCount == 0) {
+                return -1;
+              } else {
+                return selectNapr == 'Ascending'
+                    ? a.achievementCount - b.achievementCount
+                    : b.achievementCount - a.achievementCount;
+              }
+            });
+            break;
+          case 'Unachieved Achievements':
+            cards.sort((a, b) {
+              if (a.achievementCount == 0) {
+                return 1;
+              } else if (b.achievementCount == 0) {
+                return -1;
+              } else {
+                return selectNapr == 'Ascending'
+                    ? (a.achievementCount - a.gainedCount) -
+                        (b.achievementCount - b.gainedCount)
+                    : (b.achievementCount - b.gainedCount) -
+                        (a.achievementCount - a.gainedCount);
+              }
+            });
+            break;
+          case 'Achieved Achievements':
+            cards.sort((a, b) {
+              if (a.achievementCount == 0) {
+                return 1;
+              } else if (b.achievementCount == 0) {
+                return -1;
+              } else {
+                return selectNapr == 'Ascending'
+                    ? a.gainedCount - b.gainedCount
+                    : b.gainedCount - a.gainedCount;
+              }
+            });
+            break;
+          case 'Last Game Launch Time':
+            if (selectNapr == 'Ascending') {
+              cards.sort((a, b) => a.lastPlayTime - b.lastPlayTime);
+            } else {
+              cards.sort((a, b) => b.lastPlayTime - a.lastPlayTime);
+            }
+            break;
+          default:
+            break;
+        }
+      });
+    }
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -71,6 +152,7 @@ class _GamePageState extends State<GamePage> {
                 setState(() {
                   selectedFilter = newValue!;
                 });
+                sorting();
               },
               items: <String>[
                 'Game Time',
@@ -86,64 +168,23 @@ class _GamePageState extends State<GamePage> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                // Add sorting logic based on selectedFilter
-                // Example: Sort the game list based on the selected filter
-                switch (selectedFilter) {
-                  case 'Game Time':
-                    setState(() {
-                      cards.sort((a, b) => b.playtime - a.playtime);
-                    });
-                    break;
-                  case 'Achievement Percentage':
-                    setState(() {
-                      cards.sort((a, b) {
-                        double ratioA = a.gainedCount / a.achievementCount;
-                        double ratioB = b.gainedCount / b.achievementCount;
-
-                        if (ratioA < ratioB) {
-                          return 1;
-                        } else if (ratioA > ratioB) {
-                          return -1;
-                        } else if (a.achievementCount == 0 ||
-                            b.achievementCount == 0) {
-                          return 1;
-                        } else {
-                          return 0;
-                        }
-                      });
-                    });
-                    break;
-                  case 'Total Achievements':
-                    setState(() {
-                      cards.sort(
-                          (a, b) => b.achievementCount - a.achievementCount);
-                    });
-                    break;
-                  case 'Unachieved Achievements':
-                    setState(() {
-                      cards.sort((a, b) =>
-                          (b.achievementCount - b.gainedCount) -
-                          (a.achievementCount - a.gainedCount));
-                    });
-                    break;
-                  case 'Achieved Achievements':
-                    setState(() {
-                      cards.sort((a, b) => b.gainedCount - a.gainedCount);
-                    });
-                    break;
-                  case 'Last Game Launch Time':
-                    setState(() {
-                      cards.sort((a, b) => b.lastPlayTime - a.lastPlayTime);
-                    });
-                    break;
-                  default:
-                    break;
-                }
+            DropdownButton<String>(
+              value: selectNapr,
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectNapr = newValue!;
+                });
+                sorting();
               },
-              child: const Text('Apply Sort'),
+              items: <String>[
+                'Ascending',
+                'Descending',
+              ].map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
             ),
           ],
         ),
