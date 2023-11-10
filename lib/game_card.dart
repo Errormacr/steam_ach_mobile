@@ -6,6 +6,8 @@ class GameCard extends StatelessWidget {
   final bool isCompleted;
   final int achievementCount;
   final int gainedCount;
+  final int playtime;
+  final int lastPlayTime;
 
   const GameCard({
     Key? key,
@@ -14,6 +16,8 @@ class GameCard extends StatelessWidget {
     this.isCompleted = false,
     required this.achievementCount,
     required this.gainedCount,
+    required this.playtime,
+    required this.lastPlayTime,
   }) : super(key: key);
 
   @override
@@ -53,6 +57,7 @@ class GameCard extends StatelessWidget {
               fit: BoxFit.contain,
             ),
           ),
+          if (achievementCount > 0)
           Positioned(
             bottom: 35,
             left: 0,

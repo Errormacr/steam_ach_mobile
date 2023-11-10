@@ -122,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
             List<GameCard> gameCards = [];
             for (var i = 0; i < 6; i++) {
               String gameImageUrl =
-                  "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/capsule_sm_120.jpg";
+                  "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/header.jpg";
               List<classes.Achievement> ach = games[i].achievements!;
               int achCount = ach.length;
               Iterable<classes.Achievement> achi =
@@ -135,6 +135,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 isCompleted: gainedCount == achCount,
                 achievementCount: achCount,
                 gainedCount: gainedCount,
+                playtime: games[i].playtimeForever!,
+                lastPlayTime: games[i].lastPlayTime!,
               ));
             }
 
@@ -157,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
             List<GameCard> gameCards = [];
             for (var i = 0; i < 6; i++) {
               String gameImageUrl =
-                  "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/capsule_sm_120.jpg";
+                  "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/header.jpg";
               String gameName = games[i].name!.trim();
               List<classes.Achievement> ach = games[i].achievements!;
               int achCount = ach.length;
@@ -170,6 +172,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 isCompleted: achCount == gainedCount,
                 achievementCount: achCount,
                 gainedCount: gainedCount,
+                playtime: games[i].playtimeForever!,
+                lastPlayTime: games[i].lastPlayTime!,
               ));
             }
 
@@ -198,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
         id: id,
         recent: cards,
       ),
-      const GamePage(),
+      GamePage(),
       const AllAch(),
       const SettingsPage()
     ];
