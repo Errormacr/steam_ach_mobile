@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:steam_ach_mobile/API/db_methods.dart' as db_method;
 import 'widgets/game_card.dart';
 import "API/db_classes.dart" as classes;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class GamePage extends StatefulWidget {
   const GamePage({Key? key});
@@ -19,7 +20,10 @@ class _GamePageState extends State<GamePage> {
   @override
   void initState() {
     super.initState();
-    db.getUserById(76561198126403886).then((user) {
+    
+    const secureStorage = FlutterSecureStorage();
+    secureStorage.read(key: "steamId").then((steamId) {
+    db.getUserById(steamId).then((user) {
       if (user != null) {
         List<classes.Game> games = user.games;
         games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
@@ -55,7 +59,7 @@ class _GamePageState extends State<GamePage> {
         });
       }
     }); // You can call the method here or in another appropriate lifecycle method
-  }
+ }); }
 
   @override
   Widget build(BuildContext context) {
@@ -176,7 +180,6 @@ class _GamePageState extends State<GamePage> {
                 sorting();
               },
               style: ElevatedButton.styleFrom(
-                
                 primary: Colors.blue,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
               ),

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:http/http.dart' as http;
 import 'package:steam_ach_mobile/API/db_classes.dart' as classes;
-import 'package:steam_ach_mobile/widgets/notifications.dart';
 import 'dart:convert';
 import './db_methods.dart';
 import '../dataModels/player_data.dart';
@@ -10,7 +9,6 @@ import '../dataModels/game_data.dart' as gm;
 import '../dataModels/ach_data.dart' as ach_m;
 import '../dataModels/ach_perc_data.dart' as perc_m;
 import '../dataModels/ach_ico_data.dart' as icon_m;
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
 
@@ -108,7 +106,7 @@ Future<readyIsol> getGameData(
     } else {
       updatetgame.add(game.appid);
     }
-    
+
     games.add(classes.Game()
       ..appid = game.appid
       ..name = game.name
@@ -161,9 +159,7 @@ class Api {
         final numGames = gameData.response.gameCount;
         List<classes.Game> games = <classes.Game>[];
 
-        await _showNotification("Обновление", "Обновление...");
 
-        List<int> updatetgame = [];
         int splitter = numGames ~/ 6;
         List<gm.Game> game1 = gameData.response.games.sublist(0, splitter);
         List<gm.Game> game2 =
@@ -190,7 +186,6 @@ class Api {
           percents += dataReady[i].percents;
           gameWithAch += dataReady[i].gameWithAch;
         }
-        _updateNotification(100, 100);
         final recentUrl =
             "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=$apiKey&steamid=$steamId&format=json";
         final recentRes = await http.get(Uri.parse(recentUrl));
@@ -203,6 +198,7 @@ class Api {
         throw Exception('Failed to load Steam avatar');
       }
     } catch (e) {
+      print(e);
     }
     return null; // compute
   }
@@ -248,51 +244,5 @@ class Api {
       }
     }
     return false;
-  }
-
-  Future<void> _showNotification(String title, String body) async {
-    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-      'channel_id',
-      'channel_name',
-      'channel_description',
-      importance: Importance.max,
-      priority: Priority.high,
-      showProgress: true,
-      maxProgress: 100,
-      progress: 0,
-    );
-
-    var platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: 'item x',
-    );
-  }
-
-  Future<void> _updateNotification(int progress, int maxProgress) async {
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'channel_id',
-      'channel_name',
-      'channel_description',
-      importance: Importance.max,
-      priority: Priority.high,
-      showProgress: true,
-      maxProgress: maxProgress,
-      progress: progress,
-    );
-
-    var platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      "Обновление",
-      "${(progress / maxProgress * 100).toStringAsFixed(2)}%",
-      platformChannelSpecifics,
-      payload: 'item x',
-    );
   }
 }

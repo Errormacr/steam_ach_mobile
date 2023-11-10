@@ -6,25 +6,16 @@ import 'package:steam_ach_mobile/settings_page.dart';
 import './API/api.dart';
 import '/API/db_methods.dart';
 import "API/db_classes.dart" as classes;
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'home_page.dart';
-import 'widgets/notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Инициализация плагина
-  flutterLocalNotificationsPlugin
-      .initialize(
-    const InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-      iOS: IOSInitializationSettings(),
-    ),
-  )
-      .then((_) {
+  
     runApp(const MyApp());
-  });
+
 }
 
 Future<void> fetchData(BuildContext context) async {
