@@ -40,7 +40,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: const Text("OK"),
                       onPressed: () async {
                         final newApiKey = _apiKeyController.text;
-                        final secureStorage = FlutterSecureStorage();
+                        const secureStorage = FlutterSecureStorage();
                         await secureStorage.write(key: "apiKey", value: newApiKey);
                         Navigator.of(context).pop();
                       },
@@ -74,7 +74,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: const Text("OK"),
                       onPressed: () async {
                         final newSteamId = _steamIdController.text;
-                        final secureStorage = FlutterSecureStorage();
+                        const secureStorage = FlutterSecureStorage();
                         await secureStorage.write(key: "steamId", value: newSteamId);
                         Navigator.of(context).pop();
                       },

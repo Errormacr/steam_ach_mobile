@@ -65,7 +65,7 @@ class Api {
           final perResp = responsesAch[1];
           final icoResp = responsesAch[2];
           int totalAch = 0;
-          var achievedAch;
+          Iterable<Achievement> achievedAch = [];
           if (jsonDecode(achResp.body).toString() !=
                   "{playerstats: {error: Requested app has no stats, success: false}}" &&
               jsonDecode(achResp.body).toString().contains("achievements")) {
@@ -135,6 +135,7 @@ class Api {
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<void> _showNotification(String title, String body) async {

@@ -53,14 +53,14 @@ Future<void> fetchData(BuildContext context) async {
                   onChanged: (value) {
                     newApiKey = value;
                   },
-                  decoration: InputDecoration(labelText: 'Enter API Key'),
+                  decoration: const InputDecoration(labelText: 'Enter API Key'),
                 ),
               if (steamId == null || steamId.trim() == "")
                 TextField(
                   onChanged: (value) {
                     newSteamId = value;
                   },
-                  decoration: InputDecoration(labelText: 'Enter Steam ID'),
+                  decoration: const InputDecoration(labelText: 'Enter Steam ID'),
                 ),
             ],
           ),
@@ -139,7 +139,6 @@ class _MyHomePageState extends State<MyHomePage> {
         api.checkUpdate(steamId).then((url) {
           if (!url) {
             api.getUserData(steamId, "Russian").then((ele) async {
-              Methods db = Methods();
               classes.Account? user = ele;
               if (user != null) {
                 List<classes.Game> games = user.games;
@@ -235,7 +234,7 @@ class _MyHomePageState extends State<MyHomePage> {
         id: id,
         recent: cards,
       ),
-      GamePage(),
+      const GamePage(),
       const AllAch(),
       const SettingsPage()
     ];

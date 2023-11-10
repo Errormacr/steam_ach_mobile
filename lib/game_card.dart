@@ -54,7 +54,7 @@ class GameCard extends StatelessWidget {
             right: 0,
             child: CachedNetworkImage(
               imageUrl:gameImageUrl,
-              placeholder: (context,url)=> CircularProgressIndicator() ,
+              placeholder: (context,url)=> const CircularProgressIndicator() ,
               errorWidget: (context,url,error)=> Image.asset('assets/image/noimg.jpg') ,
               width: 150,
               height: 70,
@@ -69,7 +69,7 @@ class GameCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: gainedCount / achievementCount, // Assuming achievement count is out of 100
               backgroundColor: Colors.grey,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
             ),
           ),
           Positioned(
