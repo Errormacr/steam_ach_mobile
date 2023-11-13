@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:steam_ach_mobile/widgets/ahcievement_img.dart';
 import 'API/db_methods.dart';
+import 'package:intl/intl.dart';
+import 'package:unixtime/unixtime.dart';
 
 class AllAch extends StatefulWidget {
   const AllAch({Key? key}) : super(key: key);
@@ -13,7 +15,7 @@ class AllAch extends StatefulWidget {
 class _AllAchState extends State<AllAch> {
   String selectedSort = "Achieved time";
   String selectedFilter = "FilterAch";
-  String selectDirection = "ASC";
+  String selectDirection = "DESC";
   String nameSearchQuery = "";
   String gameSearchQuery = "";
   List<Achievement> achs = [];
@@ -64,6 +66,173 @@ class _AllAchState extends State<AllAch> {
 
   @override
   Widget build(BuildContext context) {
+    void sorting() {
+      setState(() {
+        switch (selectedSort) {
+          case 'Achieved time':
+            achs.sort((a, b) => selectDirection == 'ASC'
+                ? a.dateOfAch.compareTo(b.dateOfAch)
+                : b.dateOfAch.compareTo(a.dateOfAch));
+            break;
+          case 'Percent':
+            achs.sort((a, b) {
+              return selectDirection == 'ASC'
+                  ? a.percentage.compareTo(b.percentage)
+                  : b.percentage.compareTo(a.percentage);
+            });
+            break;
+          case 'Name':
+            achs.sort((a, b) {
+              return selectDirection == 'ASC'
+                  ? a.achievementName.compareTo(b.achievementName)
+                  : b.achievementName.compareTo(a.achievementName);
+            });
+            break;
+          case 'GameName':
+            achs.sort((a, b) {
+              return selectDirection == 'ASC'
+                  ? a.gameName.compareTo(b.gameName)
+                  : b.gameName.compareTo(a.gameName);
+            });
+            break;
+          default:
+            break;
+        }
+      });
+    }
+
+    void filter() {
+      switch (selectedFilter) {
+        case 'FilterAch':
+          replaceAchs(achsStorage);
+          break;
+        case 'percents':
+          RangeValues currentRange = RangeValues(0, 100);
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Select percentage range'),
+                content: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return RangeSlider(
+                      values: currentRange,
+                      min: 0,
+                      max: 100,
+                      divisions: 100,
+                      labels: RangeLabels(
+                        currentRange.start.round().toString(),
+                        currentRange.end.round().toString(),
+                      ),
+                      onChanged: (RangeValues values) {
+                        setState(() {
+                          currentRange = values;
+                        });
+                      },
+                    );
+                  },
+                ),
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // Обработка выбора диапазона процентов
+                      // Например, фильтрация списка achs по выбранному диапазону
+                      List<Achievement> filteredAchs = achsStorage
+                          .where((ach) =>
+                              ach.percentage >= currentRange.start &&
+                              ach.percentage <= currentRange.end)
+                          .toList();
+                      replaceAchs(filteredAchs);
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Apply'),
+                  ),
+                ],
+              );
+            },
+          );
+          break;
+        case "data":
+          double earliestAchievementDateInUnixEpoch = achsStorage
+              .map((ach) => ach.dateOfAch)
+              .reduce((a, b) => a < b ? a : b)
+              .toDouble();
+          int maxValue = achsStorage[0].dateOfAch;
+          for (int i = 1; i < achsStorage.length; i++) {
+            if (achsStorage[i].dateOfAch > maxValue) {
+              maxValue = achsStorage[i].dateOfAch;
+            }
+          }
+
+          double latestAchievementDateInUnixEpoch = maxValue.toDouble();
+        
+          RangeValues currentDateRange = RangeValues(
+            earliestAchievementDateInUnixEpoch, 
+            latestAchievementDateInUnixEpoch, 
+          );
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Select date range'),
+                content: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RangeSlider(
+                          values: currentDateRange,
+                          min: earliestAchievementDateInUnixEpoch,
+                          max: latestAchievementDateInUnixEpoch,
+                          onChanged: (RangeValues values) {
+                            setState(() {
+                              currentDateRange = values;
+                            });
+                          },
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              DateFormat('yyyy-MM-dd').format(
+                                currentDateRange.start.toInt().toUnixTime()
+                              ),
+                            ),
+                            Text(DateFormat('yyyy-MM-dd').format(
+                                currentDateRange.end.toInt().toUnixTime(),
+                            )),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // Обработка выбора диапазона дат
+                      // Например, фильтрация списка achs по выбранному диапазону дат
+                      List<Achievement> filteredAchs = achsStorage
+                          .where((ach) =>
+                              ach.dateOfAch >= currentDateRange.start &&
+                              ach.dateOfAch <= currentDateRange.end)
+                          .toList();
+                      replaceAchs(filteredAchs);
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Apply'),
+                  ),
+                ],
+              );
+            },
+          );
+          break;
+        default:
+          break;
+      }
+      sorting();
+    }
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -114,6 +283,7 @@ class _AllAchState extends State<AllAch> {
                 setState(() {
                   selectedFilter = newValue!;
                 });
+                filter();
               },
               items: <String>[
                 "FilterAch",
@@ -132,6 +302,7 @@ class _AllAchState extends State<AllAch> {
                 setState(() {
                   selectedSort = newValue!;
                 });
+                sorting();
               },
               items: <String>[
                 'Name',
@@ -148,7 +319,13 @@ class _AllAchState extends State<AllAch> {
             SizedBox(
                 width: 60,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      selectDirection =
+                          selectDirection == "ASC" ? "DESC" : "ASC";
+                    });
+                    sorting();
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
