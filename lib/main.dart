@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:GamersGlint/ach_page.dart';
-import 'package:GamersGlint/widgets/game_card.dart';
-import 'package:GamersGlint/game_page.dart';
-import 'package:GamersGlint/settings_page.dart';
-import './API/api.dart';
-import '/API/db_methods.dart';
-import "API/db_classes.dart" as classes;
-import 'home_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import "API/db_classes.dart" as classes;
+import './API/api.dart';
+import './API/db_methods.dart';
+import './ach_page.dart';
+import './game_page.dart';
+import './settings_page.dart';
+import './widgets/game_card.dart';
+import 'home_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -131,98 +132,102 @@ class _MyHomePageState extends State<MyHomePage> {
     reinit();
   }
 
-  void reinit() {
+  Future<void> reinit() async {
     const secureStorage = FlutterSecureStorage();
     const String lang = "Russian";
-    secureStorage.read(key: "apiKey").then((apiKey) {
-      fetchData(context).then((some) {
-        secureStorage.read(key: "steamId").then((value) {
-          Api api = Api(apiKey: apiKey!);
+    String apiKey = (await secureStorage.read(key: "apiKey"))!;
+    String value = (await secureStorage.read(key: "steamId"))!;
+    Api api = Api(apiKey: apiKey);
+    int steamId = int.tryParse(value)!;
+    api.checkUpdate(steamId).then((url) {
+      if (!url) {
+        print("error here");
+        api.getUserData(steamId, lang).then((ele) {
+          classes.Account? user = ele;
+          if (user != null) {
+            print(user.gameCount);
 
-          int steamId = int.tryParse(value!)!;
-          api.checkUpdate(steamId).then((url) {
-            if (!url) {
-              api.getUserData(steamId, lang).then((ele) async {
-                classes.Account? user = ele;
-                if (user != null) {
-                  List<classes.Game> games = user.games;
-                  games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
-                  List<GameCard> gameCards = [];
-                  for (var i = 0; i < 6; i++) {
-                    String gameImageUrl =
-                        "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/header.jpg";
-                    List<classes.Achievement> ach = games[i].achievements!;
-                    int achCount = ach.length;
-                    Iterable<classes.Achievement> achi =
-                        ach.where((element) => element.achieved);
-                    int gainedCount = achi.length;
-                    String gameName = games[i].name!.trim();
-                    gameCards.add(GameCard(
-                      gameImageUrl: gameImageUrl,
-                      gameName: gameName,
-                      isCompleted: gainedCount == achCount,
-                      achievementCount: achCount,
-                      gainedCount: gainedCount,
-                      playtime: games[i].playtimeForever!,
-                      lastPlayTime: games[i].lastPlayTime!,
-                      appid: games[i].appid!,
-                    ));
-                  }
-
-                  setState(() {
-                    avatarUrl = user.avaUrl;
-                    nickname = user.username;
-                    numGames = user.gameCount;
-                    percent = user.percentage;
-                    achCount = user.achievementCount;
-                    id = steamId;
-                    cards = gameCards;
-                  });
-                }
-              });
-            } else {
-              Methods db = Methods();
-              db.getUserById(steamId).then((user) async {
-                if (user != null) {
-                  List<classes.Game> games = user.games;
-                  games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
-                  List<GameCard> gameCards = [];
-                  for (var i = 0; i < 6; i++) {
-                    String gameImageUrl =
-                        "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/header.jpg";
-                    List<classes.Achievement> ach = games[i].achievements!;
-                    int achCount = ach.length;
-                    Iterable<classes.Achievement> achi =
-                        ach.where((element) => element.achieved);
-                    int gainedCount = achi.length;
-                    String gameName = games[i].name!.trim();
-                    gameCards.add(GameCard(
-                      gameImageUrl: gameImageUrl,
-                      gameName: gameName,
-                      isCompleted: gainedCount == achCount,
-                      achievementCount: achCount,
-                      gainedCount: gainedCount,
-                      playtime: games[i].playtimeForever!,
-                      lastPlayTime: games[i].lastPlayTime!,
-                      appid: games[i].appid!,
-                    ));
-                  }
-
-                  setState(() {
-                    avatarUrl = user.avaUrl;
-                    nickname = user.username;
-                    numGames = user.gameCount;
-                    percent = user.percentage;
-                    achCount = user.achievementCount;
-                    id = steamId;
-                    cards = gameCards;
-                  });
-                }
-              });
+            List<classes.Game> games = user.games;
+            games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
+            List<GameCard> gameCards = [];
+            for (var i = 0; i < 6; i++) {
+              String gameImageUrl =
+                  "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/header.jpg";
+              List<classes.Achievement> ach = games[i].achievements!;
+              int achCount = ach.length;
+              Iterable<classes.Achievement> achi =
+                  ach.where((element) => element.achieved);
+              int gainedCount = achi.length;
+              String gameName = games[i].name!.trim();
+              gameCards.add(GameCard(
+                gameImageUrl: gameImageUrl,
+                gameName: gameName,
+                isCompleted: gainedCount == achCount,
+                achievementCount: achCount,
+                gainedCount: gainedCount,
+                playtime: games[i].playtimeForever!,
+                lastPlayTime: games[i].lastPlayTime!,
+                appid: games[i].appid!,
+              ));
             }
-          });
+            print(user.avaUrl);
+            print(user.username);
+            print(user.gameCount);
+            print(user.percentage);
+            print(user.achievementCount);
+            print(steamId);
+            print(gameCards);
+            setState(() {
+              avatarUrl = user.avaUrl;
+              nickname = user.username;
+              numGames = user.gameCount;
+              percent = user.percentage;
+              achCount = user.achievementCount;
+              id = steamId;
+              cards = gameCards;
+            });
+          }
         });
-      });
+      } else {
+        Methods db = Methods();
+        db.getUserById(steamId).then((user) async {
+          if (user != null) {
+            List<classes.Game> games = user.games;
+            games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
+            List<GameCard> gameCards = [];
+            for (var i = 0; i < 6; i++) {
+              String gameImageUrl =
+                  "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/header.jpg";
+              List<classes.Achievement> ach = games[i].achievements!;
+              int achCount = ach.length;
+              Iterable<classes.Achievement> achi =
+                  ach.where((element) => element.achieved);
+              int gainedCount = achi.length;
+              String gameName = games[i].name!.trim();
+              gameCards.add(GameCard(
+                gameImageUrl: gameImageUrl,
+                gameName: gameName,
+                isCompleted: gainedCount == achCount,
+                achievementCount: achCount,
+                gainedCount: gainedCount,
+                playtime: games[i].playtimeForever!,
+                lastPlayTime: games[i].lastPlayTime!,
+                appid: games[i].appid!,
+              ));
+            }
+
+            setState(() {
+              avatarUrl = user.avaUrl;
+              nickname = user.username;
+              numGames = user.gameCount;
+              percent = user.percentage;
+              achCount = user.achievementCount;
+              id = steamId;
+              cards = gameCards;
+            });
+          }
+        });
+      }
     });
   }
 

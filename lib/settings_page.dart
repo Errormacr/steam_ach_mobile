@@ -99,6 +99,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 secureStorage.read(key: "steamId").then((value) {
                   Api api = Api(apiKey: apiKey!);
                   int steamId = int.tryParse(value!)!;
+                  print(apiKey + ": " +steamId.toString());
+                  
                   api.getUserData(steamId, lang).then((userData) {
                     showDialog(
                       context: context,
