@@ -96,6 +96,11 @@ class _AllAchState extends State<AllAch> {
                   setState(() {
                     gameSearchQuery = value;
                   });
+                  replaceAchs(achsStorage
+                      .where((ach) => ach.gameName
+                          .toLowerCase()
+                          .contains(gameSearchQuery.toLowerCase()))
+                      .toList());
                 },
                 decoration: const InputDecoration(
                   labelText: 'Game name',
