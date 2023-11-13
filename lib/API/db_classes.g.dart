@@ -2077,33 +2077,38 @@ const AchievementSchema = Schema(
       name: r'achieved',
       type: IsarType.bool,
     ),
-    r'description': PropertySchema(
+    r'dateOfAch': PropertySchema(
       id: 1,
+      name: r'dateOfAch',
+      type: IsarType.long,
+    ),
+    r'description': PropertySchema(
+      id: 2,
       name: r'description',
       type: IsarType.string,
     ),
     r'displayName': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'displayName',
       type: IsarType.string,
     ),
     r'icon': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'icon',
       type: IsarType.string,
     ),
     r'icongray': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'icongray',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'name',
       type: IsarType.string,
     ),
     r'percentage': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'percentage',
       type: IsarType.float,
     )
@@ -2160,12 +2165,13 @@ void _achievementSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeBool(offsets[0], object.achieved);
-  writer.writeString(offsets[1], object.description);
-  writer.writeString(offsets[2], object.displayName);
-  writer.writeString(offsets[3], object.icon);
-  writer.writeString(offsets[4], object.icongray);
-  writer.writeString(offsets[5], object.name);
-  writer.writeFloat(offsets[6], object.percentage);
+  writer.writeLong(offsets[1], object.dateOfAch);
+  writer.writeString(offsets[2], object.description);
+  writer.writeString(offsets[3], object.displayName);
+  writer.writeString(offsets[4], object.icon);
+  writer.writeString(offsets[5], object.icongray);
+  writer.writeString(offsets[6], object.name);
+  writer.writeFloat(offsets[7], object.percentage);
 }
 
 Achievement _achievementDeserialize(
@@ -2176,12 +2182,13 @@ Achievement _achievementDeserialize(
 ) {
   final object = Achievement();
   object.achieved = reader.readBool(offsets[0]);
-  object.description = reader.readStringOrNull(offsets[1]);
-  object.displayName = reader.readStringOrNull(offsets[2]);
-  object.icon = reader.readStringOrNull(offsets[3]);
-  object.icongray = reader.readStringOrNull(offsets[4]);
-  object.name = reader.readStringOrNull(offsets[5]);
-  object.percentage = reader.readFloatOrNull(offsets[6]);
+  object.dateOfAch = reader.readLongOrNull(offsets[1]);
+  object.description = reader.readStringOrNull(offsets[2]);
+  object.displayName = reader.readStringOrNull(offsets[3]);
+  object.icon = reader.readStringOrNull(offsets[4]);
+  object.icongray = reader.readStringOrNull(offsets[5]);
+  object.name = reader.readStringOrNull(offsets[6]);
+  object.percentage = reader.readFloatOrNull(offsets[7]);
   return object;
 }
 
@@ -2195,7 +2202,7 @@ P _achievementDeserializeProp<P>(
     case 0:
       return (reader.readBool(offset)) as P;
     case 1:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 2:
       return (reader.readStringOrNull(offset)) as P;
     case 3:
@@ -2205,6 +2212,8 @@ P _achievementDeserializeProp<P>(
     case 5:
       return (reader.readStringOrNull(offset)) as P;
     case 6:
+      return (reader.readStringOrNull(offset)) as P;
+    case 7:
       return (reader.readFloatOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -2219,6 +2228,80 @@ extension AchievementQueryFilter
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'achieved',
         value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Achievement, Achievement, QAfterFilterCondition>
+      dateOfAchIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'dateOfAch',
+      ));
+    });
+  }
+
+  QueryBuilder<Achievement, Achievement, QAfterFilterCondition>
+      dateOfAchIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'dateOfAch',
+      ));
+    });
+  }
+
+  QueryBuilder<Achievement, Achievement, QAfterFilterCondition>
+      dateOfAchEqualTo(int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'dateOfAch',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Achievement, Achievement, QAfterFilterCondition>
+      dateOfAchGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'dateOfAch',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Achievement, Achievement, QAfterFilterCondition>
+      dateOfAchLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'dateOfAch',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Achievement, Achievement, QAfterFilterCondition>
+      dateOfAchBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'dateOfAch',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }

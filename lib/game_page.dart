@@ -13,7 +13,7 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   String selectedFilter = 'Game Time';
-  String selectNapr = "Descending"; // Default filter
+  String selectDirection = "Descending"; // Default filter
   List<GameCard> cards = [];
   db_method.Methods db = db_method.Methods();
 
@@ -23,7 +23,7 @@ class _GamePageState extends State<GamePage> {
     
     const secureStorage = FlutterSecureStorage();
     secureStorage.read(key: "steamId").then((steamId) {
-    db.getUserById(steamId).then((user) {
+    db.getUserById(int.tryParse(steamId!)).then((user) {
       if (user != null) {
         List<classes.Game> games = user.games;
         games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
@@ -35,9 +35,9 @@ class _GamePageState extends State<GamePage> {
           String gameName = games[i].name!.trim();
           List<classes.Achievement> ach = games[i].achievements!;
           int achCount = ach.length;
-          Iterable<classes.Achievement> achi =
+          Iterable<classes.Achievement> achievedAch =
               ach.where((element) => element.achieved);
-          int gainedCount = achi.length;
+          int gainedCount = achievedAch.length;
           int? parsedAchCount = int.tryParse(achCount.toString());
           if (parsedAchCount == null) {
             gainedCount = 0;
@@ -67,7 +67,7 @@ class _GamePageState extends State<GamePage> {
       setState(() {
         switch (selectedFilter) {
           case 'Game Time':
-            cards.sort((a, b) => selectNapr == 'Ascending'
+            cards.sort((a, b) => selectDirection == 'Ascending'
                 ? a.playtime.compareTo(b.playtime)
                 : b.playtime.compareTo(a.playtime));
             break;
@@ -84,7 +84,7 @@ class _GamePageState extends State<GamePage> {
               } else if (b.achievementCount == 0) {
                 return -1;
               } else {
-                return selectNapr == 'Ascending'
+                return selectDirection == 'Ascending'
                     ? ratioA.compareTo(ratioB)
                     : ratioB.compareTo(ratioA);
               }
@@ -97,7 +97,7 @@ class _GamePageState extends State<GamePage> {
               } else if (b.achievementCount == 0) {
                 return -1;
               } else {
-                return selectNapr == 'Ascending'
+                return selectDirection == 'Ascending'
                     ? a.achievementCount - b.achievementCount
                     : b.achievementCount - a.achievementCount;
               }
@@ -110,7 +110,7 @@ class _GamePageState extends State<GamePage> {
               } else if (b.achievementCount == 0) {
                 return -1;
               } else {
-                return selectNapr == 'Ascending'
+                return selectDirection == 'Ascending'
                     ? (a.achievementCount - a.gainedCount) -
                         (b.achievementCount - b.gainedCount)
                     : (b.achievementCount - b.gainedCount) -
@@ -125,14 +125,14 @@ class _GamePageState extends State<GamePage> {
               } else if (b.achievementCount == 0) {
                 return -1;
               } else {
-                return selectNapr == 'Ascending'
+                return selectDirection == 'Ascending'
                     ? a.gainedCount - b.gainedCount
                     : b.gainedCount - a.gainedCount;
               }
             });
             break;
           case 'Last Game Launch Time':
-            if (selectNapr == 'Ascending') {
+            if (selectDirection == 'Ascending') {
               cards.sort((a, b) => a.lastPlayTime - b.lastPlayTime);
             } else {
               cards.sort((a, b) => b.lastPlayTime - a.lastPlayTime);
@@ -175,19 +175,19 @@ class _GamePageState extends State<GamePage> {
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  selectNapr = selectNapr == "Ascending" ? "dec" : "Ascending";
+                  selectDirection = selectDirection == "Ascending" ? "dec" : "Ascending";
                 });
                 sorting();
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.blue,
+                backgroundColor: Colors.blue,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Icon(
-                    selectNapr == "Ascending"
+                    selectDirection == "Ascending"
                         ? Icons.arrow_upward
                         : Icons.arrow_downward,
                     size: 20,

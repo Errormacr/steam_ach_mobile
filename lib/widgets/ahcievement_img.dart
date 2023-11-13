@@ -2,21 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class Achievement extends StatelessWidget {
+  final String gameName;
   final String imgUrl;
   final String achievementName;
-  final int percentage;
+  final double percentage;
+  final int dateOfAch;
 
   const Achievement({
     Key? key,
+    required this.gameName,
     required this.imgUrl,
     required this.achievementName,
     required this.percentage,
+    required this.dateOfAch,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 200,
+      width: 150,
       height: 100,
       decoration: BoxDecoration(
         shape: BoxShape.rectangle,
@@ -39,8 +43,7 @@ class Achievement extends StatelessWidget {
             ),
             child: CachedNetworkImage(
               imageUrl: imgUrl,
-              placeholder: (context, url) =>
-                  const CircularProgressIndicator(),
+              placeholder: (context, url) => const CircularProgressIndicator(),
               errorWidget: (context, url, error) =>
                   Image.asset('assets/image/noAch.svg'),
               width: 45,
@@ -59,7 +62,7 @@ class Achievement extends StatelessWidget {
               ),
               SizedBox(height: 5),
               Text(
-                'Percentage: $percentage%',
+                'Percentage: ${percentage.toStringAsFixed(2)}%',
                 style: TextStyle(fontSize: 14),
               ),
             ],

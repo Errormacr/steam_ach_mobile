@@ -13,8 +13,8 @@ class Account {
   String avaUrl;
   List<Game> games;
 
-  Account(this.id, this.username, this.recent,this.gameCount, this.achievementCount,
-      this.percentage, this.avaUrl, this.games);
+  Account(this.id, this.username, this.recent, this.gameCount,
+      this.achievementCount, this.percentage, this.avaUrl, this.games);
 }
 
 @embedded
@@ -24,7 +24,7 @@ class Game {
   int? playtimeForever;
   String? imgIconUrl;
   double? percent;
-  int? lastPlayTime;  
+  int? lastPlayTime;
   List<Achievement>? achievements;
 }
 
@@ -37,4 +37,5 @@ class Achievement {
   String? icongray;
   bool achieved = false;
   float? percentage;
+  int? dateOfAch;
 }

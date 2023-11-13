@@ -13,19 +13,21 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Инициализация плагина
-  
-    runApp(const MyApp());
 
+  runApp(const MyApp());
 }
 
 Future<void> fetchData(BuildContext context) async {
   const secureStorage = FlutterSecureStorage();
-  final storedData = await secureStorage.read(key: "apiKey");
-  final steamId = await secureStorage.read(key: "steamId");
-  if (storedData == null ||
-      steamId == null ||
-      steamId.trim() == "" ||
-      storedData.trim() == "") {
+  String storedData = "";
+  String steamId = "";
+  try {
+    storedData = (await secureStorage.read(key: "apiKey"))!;
+    steamId = (await secureStorage.read(key: "steamId"))!;
+  } catch (e) {
+    print(e);
+  }
+  if (steamId.trim() == "" || storedData.trim() == "") {
     // ignore: use_build_context_synchronously
     final newData = await showDialog<String>(
       context: context,
@@ -37,14 +39,14 @@ Future<void> fetchData(BuildContext context) async {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              if (storedData == null || storedData.trim() == "")
+              if (storedData.trim() == "")
                 TextField(
                   onChanged: (value) {
                     newApiKey = value;
                   },
                   decoration: const InputDecoration(labelText: 'Enter API Key'),
                 ),
-              if (steamId == null || steamId.trim() == "")
+              if (steamId.trim() == "")
                 TextField(
                   onChanged: (value) {
                     newSteamId = value;
@@ -130,10 +132,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void reinit() {
     const secureStorage = FlutterSecureStorage();
+
     secureStorage.read(key: "apiKey").then((apiKey) {
-      Api api = Api(apiKey: apiKey!);
       fetchData(context).then((some) {
         secureStorage.read(key: "steamId").then((value) {
+          Api api = Api(apiKey: apiKey!);
+
           int steamId = int.tryParse(value!)!;
           api.checkUpdate(steamId).then((url) {
             if (!url) {
@@ -177,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Methods db = Methods();
               db.getUserById(steamId).then((user) async {
                 if (user != null) {
-                 List<classes.Game> games = user.games;
+                  List<classes.Game> games = user.games;
                   games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
                   List<GameCard> gameCards = [];
                   for (var i = 0; i < 6; i++) {
@@ -199,7 +203,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       lastPlayTime: games[i].lastPlayTime!,
                     ));
                   }
-
 
                   setState(() {
                     avatarUrl = user.avaUrl;
@@ -236,6 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 20,
         title: const Text('Steam Avatar'),
       ),
       body: pages[_currentIndex],

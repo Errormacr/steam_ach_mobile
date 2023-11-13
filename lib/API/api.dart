@@ -91,7 +91,8 @@ Future<readyIsol> getGameData(
           ..icon = matchingItem2.icon
           ..icongray = matchingItem2.icongray
           ..achieved = item.achieved == 1 ? true : false
-          ..percentage = matchingItem.percent);
+          ..percentage = matchingItem.percent
+          ..dateOfAch = item.unlocktime);
       }
       totalAch = achievements.length;
       if (totalAch > 0) {
