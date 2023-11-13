@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
+import 'package:unixtime/unixtime.dart';
 
 class Achievement extends StatelessWidget {
   final String gameName;
@@ -7,6 +9,7 @@ class Achievement extends StatelessWidget {
   final String achievementName;
   final double percentage;
   final int dateOfAch;
+  final bool achieved;
 
   const Achievement({
     Key? key,
@@ -15,6 +18,7 @@ class Achievement extends StatelessWidget {
     required this.achievementName,
     required this.percentage,
     required this.dateOfAch,
+    required this.achieved,
   });
 
   @override
@@ -26,10 +30,15 @@ class Achievement extends StatelessWidget {
         shape: BoxShape.rectangle,
         boxShadow: [
           BoxShadow(
-            color: Colors.blueAccent.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 8,
-            offset: Offset(0, 0),
+            color: percentage < 5
+                ? const Color.fromARGB(110, 255, 184, 78)
+                : percentage < 20
+                    ? const Color.fromARGB(110, 217, 0, 255)
+                    : percentage < 45
+                        ? const Color.fromARGB(110, 60, 0, 255)
+                        : percentage < 60
+                            ? const Color.fromARGB(110, 43, 160, 1)
+                            : const Color.fromARGB(110, 60, 255, 0),
           ),
         ],
       ),
@@ -51,19 +60,27 @@ class Achievement extends StatelessWidget {
               fit: BoxFit.contain,
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 achievementName,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               Text(
-                'Percentage: ${percentage.toStringAsFixed(2)}%',
-                style: TextStyle(fontSize: 14),
+                '${percentage.toStringAsFixed(2)}%',
+                style: const TextStyle(fontSize: 14),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                '${DateFormat('yyyy-MM-dd hh').format(dateOfAch.toUnixTime())}',
+                style: const TextStyle(fontSize: 14),
               ),
             ],
           ),

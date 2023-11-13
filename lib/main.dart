@@ -164,6 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       gainedCount: gainedCount,
                       playtime: games[i].playtimeForever!,
                       lastPlayTime: games[i].lastPlayTime!,
+                      appid: games[i].appid!,
                     ));
                   }
 
@@ -201,6 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       gainedCount: gainedCount,
                       playtime: games[i].playtimeForever!,
                       lastPlayTime: games[i].lastPlayTime!,
+                      appid: games[i].appid!,
                     ));
                   }
 

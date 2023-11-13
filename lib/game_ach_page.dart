@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:steam_ach_mobile/widgets/ahcievement_img.dart';
+import 'package:steam_ach_mobile/API/db_classes.dart';
+import 'package:steam_ach_mobile/widgets/ahcievement_img.dart' as achImgLib;
 import 'API/db_methods.dart';
 import 'package:intl/intl.dart';
 import 'package:unixtime/unixtime.dart';
 
-class AllAch extends StatefulWidget {
-  const AllAch({Key? key}) : super(key: key);
+class GameAch extends StatefulWidget {
+  final int gameAppid;
+
+  const GameAch({Key? key, required this.gameAppid}) : super(key: key);
 
   @override
-  _AllAchState createState() => _AllAchState();
+  _GameAchState createState() => _GameAchState();
 }
 
-class _AllAchState extends State<AllAch> {
+class _GameAchState extends State<GameAch> {
   String selectedSort = "Achieved time";
   String selectedFilter = "FilterAch";
   String selectDirection = "DESC";
   String nameSearchQuery = "";
   String gameSearchQuery = "";
-  List<Achievement> achs = [];
-  List<Achievement> achsStorage = [];
+  String gameName = "";
+  List<achImgLib.Achievement> achs = [];
+  List<achImgLib.Achievement> achsStorage = [];
   Methods db = Methods();
   @override
   void initState() {
@@ -28,25 +32,23 @@ class _AllAchState extends State<AllAch> {
     secureStorage.read(key: "steamId").then((steamId) {
       db.getUserById(int.tryParse(steamId!)).then((user) {
         if (user != null) {
-          List<Achievement> achImgs = [];
-          for (var game in user.games) {
-            if (game.percent! > 0) {
-              for (var ach in game.achievements!) {
-                if (ach.achieved) {
-                  int unlocktime = ach.dateOfAch!;
-                  Achievement achImg = Achievement(
-                    gameName: game.name!,
-                    imgUrl: ach.icon!,
-                    achievementName: ach.displayName!,
-                    percentage: ach.percentage!,
-                    dateOfAch: unlocktime,
-                    achieved: ach.achieved,
-                  );
-                  achImgs.add(achImg);
-                }
-              }
-            }
+          List<achImgLib.Achievement> achImgs = [];
+          Game game =
+              user.games.firstWhere((game) => game.appid == widget.gameAppid);
+          gameName = game.name!;
+          for (var ach in game.achievements!) {
+            int unlocktime = ach.dateOfAch!;
+            achImgLib.Achievement achImg = achImgLib.Achievement(
+              gameName: game.name!,
+              imgUrl: ach.achieved ? ach.icon! : ach.icongray!,
+              achievementName: ach.displayName!,
+              percentage: ach.percentage!,
+              dateOfAch: unlocktime,
+              achieved: ach.achieved,
+            );
+            achImgs.add(achImg);
           }
+
           achImgs.sort((a, b) {
             return b.dateOfAch - a.dateOfAch;
           });
@@ -59,7 +61,7 @@ class _AllAchState extends State<AllAch> {
     });
   }
 
-  void replaceAchs(List<Achievement> listAchievement) {
+  void replaceAchs(List<achImgLib.Achievement> listAchievement) {
     setState(() {
       achs = listAchievement;
     });
@@ -89,13 +91,22 @@ class _AllAchState extends State<AllAch> {
                   : a.achievementName.compareTo(b.achievementName);
             });
             break;
-          case 'GameName':
+          case 'achieved':
             achs.sort((a, b) {
-              return selectDirection == 'ASC'
-                  ? b.gameName.compareTo(a.gameName)
-                  : a.gameName.compareTo(b.gameName);
+              if (selectDirection == "ASC") {
+                return b.achieved == a.achieved
+                    ? 0
+                    : b.achieved
+                        ? -1
+                        : 1;
+              } else {
+                return a.achieved == b.achieved
+                    ? 0
+                    : a.achieved
+                        ? -1
+                        : 1;
+              }
             });
-            break;
           default:
             break;
         }
@@ -106,6 +117,14 @@ class _AllAchState extends State<AllAch> {
       switch (selectedFilter) {
         case 'FilterAch':
           replaceAchs(achsStorage);
+          break;
+        case "achieved":
+          replaceAchs(
+              achsStorage.where((element) => element.achieved).toList());
+          break;
+        case "nonAchieved":
+          replaceAchs(
+              achsStorage.where((element) => !element.achieved).toList());
           break;
         case 'percents':
           RangeValues currentRange = RangeValues(0, 100);
@@ -138,7 +157,7 @@ class _AllAchState extends State<AllAch> {
                     onPressed: () {
                       // Обработка выбора диапазона процентов
                       // Например, фильтрация списка achs по выбранному диапазону
-                      List<Achievement> filteredAchs = achsStorage
+                      List<achImgLib.Achievement> filteredAchs = achsStorage
                           .where((ach) =>
                               ach.percentage >= currentRange.start &&
                               ach.percentage <= currentRange.end)
@@ -166,10 +185,10 @@ class _AllAchState extends State<AllAch> {
           }
 
           double latestAchievementDateInUnixEpoch = maxValue.toDouble();
-        
+
           RangeValues currentDateRange = RangeValues(
-            earliestAchievementDateInUnixEpoch, 
-            latestAchievementDateInUnixEpoch, 
+            earliestAchievementDateInUnixEpoch,
+            latestAchievementDateInUnixEpoch,
           );
           showDialog(
             context: context,
@@ -196,11 +215,10 @@ class _AllAchState extends State<AllAch> {
                           children: [
                             Text(
                               DateFormat('yyyy-MM-dd').format(
-                                currentDateRange.start.toInt().toUnixTime()
-                              ),
+                                  currentDateRange.start.toInt().toUnixTime()),
                             ),
                             Text(DateFormat('yyyy-MM-dd').format(
-                                currentDateRange.end.toInt().toUnixTime(),
+                              currentDateRange.end.toInt().toUnixTime(),
                             )),
                           ],
                         ),
@@ -213,7 +231,7 @@ class _AllAchState extends State<AllAch> {
                     onPressed: () {
                       // Обработка выбора диапазона дат
                       // Например, фильтрация списка achs по выбранному диапазону дат
-                      List<Achievement> filteredAchs = achsStorage
+                      List<achImgLib.Achievement> filteredAchs = achsStorage
                           .where((ach) =>
                               ach.dateOfAch >= currentDateRange.start &&
                               ach.dateOfAch <= currentDateRange.end)
@@ -234,133 +252,118 @@ class _AllAchState extends State<AllAch> {
       sorting();
     }
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Wrap(
-          spacing: 10,
+    return Scaffold(
+        appBar: AppBar(title: Text(gameName)),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 150,
-              child: TextField(
-                onChanged: (String value) {
-                  setState(() {
-                    nameSearchQuery = value;
-                  });
-                  replaceAchs(achsStorage
-                      .where((ach) => ach.achievementName
-                          .toLowerCase()
-                          .contains(nameSearchQuery.toLowerCase()))
-                      .toList());
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Ach name',
-                  border: OutlineInputBorder(),
+            Wrap(
+              spacing: 10,
+              children: [
+                SizedBox(
+                  width: 300,
+                  child: TextField(
+                    onChanged: (String value) {
+                      setState(() {
+                        nameSearchQuery = value;
+                      });
+                      replaceAchs(achsStorage
+                          .where((ach) => ach.achievementName
+                              .toLowerCase()
+                              .contains(nameSearchQuery.toLowerCase()))
+                          .toList());
+                    },
+                    decoration: const InputDecoration(
+                      labelText: 'Ach name',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            SizedBox(
-              width: 150,
-              child: TextField(
-                onChanged: (String value) {
-                  setState(() {
-                    gameSearchQuery = value;
-                  });
-                  replaceAchs(achsStorage
-                      .where((ach) => ach.gameName
-                          .toLowerCase()
-                          .contains(gameSearchQuery.toLowerCase()))
-                      .toList());
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Game name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-            DropdownButton<String>(
-              value: selectedFilter,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedFilter = newValue!;
-                });
-                filter();
-              },
-              items: <String>[
-                "FilterAch",
-                'percents',
-                'data',
-              ].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            DropdownButton<String>(
-              value: selectedSort,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedSort = newValue!;
-                });
-                sorting();
-              },
-              items: <String>[
-                'Name',
-                'Percent',
-                'GameName',
-                'Achieved time',
-              ].map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(
-                width: 60,
-                child: ElevatedButton(
-                  onPressed: () {
+                DropdownButton<String>(
+                  value: selectedFilter,
+                  onChanged: (String? newValue) {
                     setState(() {
-                      selectDirection =
-                          selectDirection == "ASC" ? "DESC" : "ASC";
+                      selectedFilter = newValue!;
+                    });
+                    filter();
+                  },
+                  items: <String>[
+                    "FilterAch",
+                    'percents',
+                    'data',
+                    "achieved",
+                    "nonAchieved"
+                  ].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+                DropdownButton<String>(
+                  value: selectedSort,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedSort = newValue!;
                     });
                     sorting();
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Icon(
-                        selectDirection == "ASC"
-                            ? Icons.arrow_upward
-                            : Icons.arrow_downward,
-                        size: 20,
+                  items: <String>[
+                    'Name',
+                    'Percent',
+                    'Achieved time',
+                    "achieved"
+                  ].map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+                SizedBox(
+                    width: 60,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          selectDirection =
+                              selectDirection == "ASC" ? "DESC" : "ASC";
+                        });
+                        sorting();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                       ),
-                    ],
-                  ),
-                ))
-          ],
-        ),
-        Expanded(
-          // Changed SingleChildScrollView to Expanded
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              mainAxisExtent: 170,
-              maxCrossAxisExtent: 140, // максимальная ширина элемента
-              crossAxisSpacing: 10, // расстояние между столбцами
-              mainAxisSpacing: 30, // расстояние между строками
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Icon(
+                            selectDirection == "ASC"
+                                ? Icons.arrow_upward
+                                : Icons.arrow_downward,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ))
+              ],
             ),
-            itemCount: achs.length, // количество элементов в гриде
-            itemBuilder: (BuildContext context, int index) {
-              return achs[index];
-            },
-          ),
-        )
-      ],
-    );
+            Expanded(
+              // Changed SingleChildScrollView to Expanded
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  mainAxisExtent: 170,
+                  maxCrossAxisExtent: 140, // максимальная ширина элемента
+                  crossAxisSpacing: 10, // расстояние между столбцами
+                  mainAxisSpacing: 30, // расстояние между строками
+                ),
+                itemCount: achs.length, // количество элементов в гриде
+                itemBuilder: (BuildContext context, int index) {
+                  return achs[index];
+                },
+              ),
+            )
+          ],
+        ));
   }
 }
