@@ -173,17 +173,16 @@ class _GamePageState extends State<GamePage> {
                 );
               }).toList(),
             ),
-            ElevatedButton(
+            SizedBox(width: 40,child:  ElevatedButton(
               onPressed: () {
                 setState(() {
                   selectDirection = selectDirection == "Ascending" ? "dec" : "Ascending";
                 });
                 sorting();
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-              ),
+               style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 10,)
+                      ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -196,7 +195,8 @@ class _GamePageState extends State<GamePage> {
                 ],
               ),
             )
-          ],
+         ,)
+            ],
         ),
         Expanded(
           // Changed SingleChildScrollView to Expanded

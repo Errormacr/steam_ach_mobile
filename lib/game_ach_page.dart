@@ -321,7 +321,7 @@ class _GameAchState extends State<GameAch> {
                   }).toList(),
                 ),
                 SizedBox(
-                    width: 60,
+                    width: 40,
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() {
@@ -331,8 +331,7 @@ class _GameAchState extends State<GameAch> {
                         sorting();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 10,)
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
