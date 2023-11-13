@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:steam_ach_mobile/widgets/game_card.dart';
+import 'package:GamersGlint/widgets/game_card.dart';
 import 'widgets/two_rad.dart';
 
 class HomePage extends StatelessWidget {
@@ -10,6 +10,7 @@ class HomePage extends StatelessWidget {
   final double widthHeight = 100;
   final int? id;
   final List<GameCard>? recent;
+  final int achCount;
   const HomePage({
     Key? key,
     this.nickname,
@@ -18,11 +19,11 @@ class HomePage extends StatelessWidget {
     this.percent,
     this.id,
     this.recent,
+    required this.achCount,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     return Center(
       child: Wrap(
         direction: Axis.vertical,
@@ -30,7 +31,7 @@ class HomePage extends StatelessWidget {
         runSpacing: 20,
         children: [
           Container(
-            width: 240,
+            width: 360,
             height: widthHeight + 100,
             alignment: Alignment.center,
             child: Center(
@@ -72,7 +73,12 @@ class HomePage extends StatelessWidget {
                         widthProgress: widthHeight,
                         progress: percent!.toStringAsFixed(2),
                       ),
-                    ),
+                    ),const SizedBox(width: 20,),
+                  SizedBox(
+                    width: widthHeight,
+                    height: widthHeight,
+                    child: Center(child: Text("Achievement: $achCount"),)
+                  )
                 ],
               ),
             ),

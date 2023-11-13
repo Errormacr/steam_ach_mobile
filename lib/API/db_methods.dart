@@ -1,6 +1,6 @@
 import 'package:path_provider/path_provider.dart';
 import 'package:isar/isar.dart';
-import 'package:steam_ach_mobile/API/db_classes.dart';
+import 'package:GamersGlint/API/db_classes.dart';
 
 class Database {
   Future<Isar> open() async {

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:http/http.dart' as http;
-import 'package:steam_ach_mobile/API/db_classes.dart' as classes;
+import 'package:GamersGlint/API/db_classes.dart' as classes;
 import 'dart:convert';
 import './db_methods.dart';
 import '../dataModels/player_data.dart';
@@ -95,11 +95,10 @@ Future<readyIsol> getGameData(
           ..dateOfAch = item.unlocktime);
       }
       totalAch = achievements.length;
-      if (totalAch > 0) {
-        achCount += totalAch;
-      }
+     
       achievedAch = achievements.where((item) => item.achieved == true);
       if (achievedAch.isNotEmpty) {
+        achCount += achievedAch.length;
         percents += achievedAch.length / totalAch;
         gameWithAch++;
       }

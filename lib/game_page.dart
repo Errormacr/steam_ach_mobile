@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:steam_ach_mobile/API/db_methods.dart' as db_method;
+import 'package:GamersGlint/API/db_methods.dart' as db_method;
 import 'widgets/game_card.dart';
 import "API/db_classes.dart" as classes;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

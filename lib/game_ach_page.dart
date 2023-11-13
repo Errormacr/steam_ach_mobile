@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:steam_ach_mobile/API/db_classes.dart';
-import 'package:steam_ach_mobile/widgets/ahcievement_img.dart' as achImgLib;
+import 'package:GamersGlint/API/db_classes.dart';
+import 'package:GamersGlint/widgets/ahcievement_img.dart' as achImgLib;
 import 'API/db_methods.dart';
 import 'package:intl/intl.dart';
 import 'package:unixtime/unixtime.dart';

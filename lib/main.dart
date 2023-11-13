@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:steam_ach_mobile/ach_page.dart';
-import 'package:steam_ach_mobile/widgets/game_card.dart';
-import 'package:steam_ach_mobile/game_page.dart';
-import 'package:steam_ach_mobile/settings_page.dart';
+import 'package:GamersGlint/ach_page.dart';
+import 'package:GamersGlint/widgets/game_card.dart';
+import 'package:GamersGlint/game_page.dart';
+import 'package:GamersGlint/settings_page.dart';
 import './API/api.dart';
 import '/API/db_methods.dart';
 import "API/db_classes.dart" as classes;
@@ -121,6 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? nickname;
   int? numGames;
   double? percent;
+  int achCount = 0;
 
   int _currentIndex = 0;
 
@@ -132,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void reinit() {
     const secureStorage = FlutterSecureStorage();
-
+    const String lang = "Russian";
     secureStorage.read(key: "apiKey").then((apiKey) {
       fetchData(context).then((some) {
         secureStorage.read(key: "steamId").then((value) {
@@ -141,7 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
           int steamId = int.tryParse(value!)!;
           api.checkUpdate(steamId).then((url) {
             if (!url) {
-              api.getUserData(steamId, "Russian").then((ele) async {
+              api.getUserData(steamId, lang).then((ele) async {
                 classes.Account? user = ele;
                 if (user != null) {
                   List<classes.Game> games = user.games;
@@ -173,6 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     nickname = user.username;
                     numGames = user.gameCount;
                     percent = user.percentage;
+                    achCount = user.achievementCount;
                     id = steamId;
                     cards = gameCards;
                   });
@@ -211,6 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     nickname = user.username;
                     numGames = user.gameCount;
                     percent = user.percentage;
+                    achCount = user.achievementCount;
                     id = steamId;
                     cards = gameCards;
                   });
@@ -233,6 +236,7 @@ class _MyHomePageState extends State<MyHomePage> {
         percent: percent,
         id: id,
         recent: cards,
+        achCount: achCount,
       ),
       const GamePage(),
       const AllAch(),
