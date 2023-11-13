@@ -67,12 +67,12 @@ Future<void> fetchData(BuildContext context) async {
               child: const Text("Save"),
               onPressed: () async {
                 // Save the entered data in secure storage
-                if (storedData == null || storedData.trim() == "") {
+                if (storedData.trim() == "") {
                   await secureStorage.write(key: "apiKey", value: newApiKey);
                   // ignore: use_build_context_synchronously
                   Navigator.of(context).pop(newApiKey);
                 }
-                if (steamId == null || steamId.trim() == "") {
+                if (steamId.trim() == "") {
                   await secureStorage.write(key: "steamId", value: newSteamId);
                   Navigator.of(context).pop(newSteamId);
                 }
