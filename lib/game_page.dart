@@ -29,9 +29,6 @@ class _GamePageState extends State<GamePage> {
         games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
         List<GameCard> gameCards = [];
         for (var i = 0; i < games.length; i++) {
-          // Changed gameCards.length to games.length
-          String gameImageUrl =
-              "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/header.jpg";
           String gameName = games[i].name!.trim();
           List<classes.Achievement> ach = games[i].achievements!;
           int achCount = ach.length;
@@ -44,7 +41,6 @@ class _GamePageState extends State<GamePage> {
             achCount = 0;
           }
           gameCards.add(GameCard(
-            gameImageUrl: gameImageUrl,
             gameName: gameName,
             isCompleted: achCount == gainedCount && achCount != 0,
             achievementCount: achCount,
@@ -202,9 +198,9 @@ class _GamePageState extends State<GamePage> {
           // Changed SingleChildScrollView to Expanded
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              mainAxisExtent: 115,
-              maxCrossAxisExtent: 200, // максимальная ширина элемента
-              crossAxisSpacing: 4, // расстояние между столбцами
+              mainAxisExtent: 230,
+              maxCrossAxisExtent: 140, // максимальная ширина элемента
+              crossAxisSpacing: 3, // расстояние между столбцами
               mainAxisSpacing: 10, // расстояние между строками
             ),
             itemCount: cards.length, // количество элементов в гриде

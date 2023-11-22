@@ -116,7 +116,12 @@ class _AllAchState extends State<AllAch> {
                 title: Text('Select percentage range'),
                 content: StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
-                    return RangeSlider(
+                    return 
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                    RangeSlider(
+                      
                       values: currentRange,
                       min: 0,
                       max: 100,
@@ -130,7 +135,7 @@ class _AllAchState extends State<AllAch> {
                           currentRange = values;
                         });
                       },
-                    );
+                    )],);
                   },
                 ),
                 actions: [

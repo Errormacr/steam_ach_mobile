@@ -151,8 +151,6 @@ class _MyHomePageState extends State<MyHomePage> {
             games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
             List<GameCard> gameCards = [];
             for (var i = 0; i < 6; i++) {
-              String gameImageUrl =
-                  "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/header.jpg";
               List<classes.Achievement> ach = games[i].achievements!;
               int achCount = ach.length;
               Iterable<classes.Achievement> achi =
@@ -160,7 +158,6 @@ class _MyHomePageState extends State<MyHomePage> {
               int gainedCount = achi.length;
               String gameName = games[i].name!.trim();
               gameCards.add(GameCard(
-                gameImageUrl: gameImageUrl,
                 gameName: gameName,
                 isCompleted: gainedCount == achCount,
                 achievementCount: achCount,
@@ -196,8 +193,6 @@ class _MyHomePageState extends State<MyHomePage> {
             games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
             List<GameCard> gameCards = [];
             for (var i = 0; i < 6; i++) {
-              String gameImageUrl =
-                  "https://steamcdn-a.akamaihd.net/steam/apps/${games[i].appid}/header.jpg";
               List<classes.Achievement> ach = games[i].achievements!;
               int achCount = ach.length;
               Iterable<classes.Achievement> achi =
@@ -205,7 +200,6 @@ class _MyHomePageState extends State<MyHomePage> {
               int gainedCount = achi.length;
               String gameName = games[i].name!.trim();
               gameCards.add(GameCard(
-                gameImageUrl: gameImageUrl,
                 gameName: gameName,
                 isCompleted: gainedCount == achCount,
                 achievementCount: achCount,
@@ -276,11 +270,11 @@ class _MyHomePageState extends State<MyHomePage> {
               Icons.auto_awesome_mosaic,
               color: Colors.black,
             ),
-            label: 'games',
+            label: 'Games',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.auto_awesome_motion, color: Colors.black),
-            label: '',
+            label: 'Achievements',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings, color: Colors.black),

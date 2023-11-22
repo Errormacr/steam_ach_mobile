@@ -135,21 +135,23 @@ class _GameAchState extends State<GameAch> {
                 title: Text('Select percentage range'),
                 content: StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
-                    return RangeSlider(
-                      values: currentRange,
-                      min: 0,
-                      max: 100,
-                      divisions: 100,
-                      labels: RangeLabels(
-                        currentRange.start.round().toString(),
-                        currentRange.end.round().toString(),
-                      ),
-                      onChanged: (RangeValues values) {
-                        setState(() {
-                          currentRange = values;
-                        });
-                      },
-                    );
+                    return Column(mainAxisSize: MainAxisSize.min, children: [
+                      RangeSlider(
+                        values: currentRange,
+                        min: 0,
+                        max: 100,
+                        divisions: 100,
+                        labels: RangeLabels(
+                          currentRange.start.round().toString(),
+                          currentRange.end.round().toString(),
+                        ),
+                        onChanged: (RangeValues values) {
+                          setState(() {
+                            currentRange = values;
+                          });
+                        },
+                      )
+                    ]);
                   },
                 ),
                 actions: [
@@ -331,8 +333,9 @@ class _GameAchState extends State<GameAch> {
                         sorting();
                       },
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 10,)
-                      ),
+                          padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                      )),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

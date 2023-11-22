@@ -3,7 +3,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:GamersGlint/game_ach_page.dart';
 
 class GameCard extends StatelessWidget {
-  final String gameImageUrl;
   final String gameName;
   final bool isCompleted;
   final int achievementCount;
@@ -14,7 +13,6 @@ class GameCard extends StatelessWidget {
 
   const GameCard({
     Key? key,
-    required this.gameImageUrl,
     required this.gameName,
     this.isCompleted = false,
     required this.achievementCount,
@@ -30,7 +28,10 @@ class GameCard extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => GameAch(gameAppid: appid,)),
+            MaterialPageRoute(
+                builder: (context) => GameAch(
+                      gameAppid: appid,
+                    )),
           );
         },
         child: Container(
@@ -44,7 +45,7 @@ class GameCard extends StatelessWidget {
                   left: 0,
                   top: 0,
                   child: Container(
-                    width: 190,
+                    width: 120,
                     height: 90,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(0),
@@ -64,13 +65,18 @@ class GameCard extends StatelessWidget {
                 left: 0,
                 right: 0,
                 child: CachedNetworkImage(
-                  imageUrl: gameImageUrl,
+                  imageUrl:
+                      "https://steamcdn-a.akamaihd.net/steam/apps/$appid/library_600x900.jpg",
                   placeholder: (context, url) =>
                       const CircularProgressIndicator(),
-                  errorWidget: (context, url, error) =>
-                      Image.asset('assets/image/noimg.jpg'),
-                  width: 150,
-                  height: 70,
+                  errorWidget: (context, url, error) => CachedNetworkImage(
+                    imageUrl:
+                        "https://steamcdn-a.akamaihd.net/steam/apps/$appid/header.jpg",
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        Image.asset('assets/image/noimg.jpg'),
+                  ),
                   fit: BoxFit.contain,
                 ),
               ),

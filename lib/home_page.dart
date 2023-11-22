@@ -73,24 +73,28 @@ class HomePage extends StatelessWidget {
                         widthProgress: widthHeight,
                         progress: percent!.toStringAsFixed(2),
                       ),
-                    ),const SizedBox(width: 20,),
+                    ),
+                  const SizedBox(
+                    width: 20,
+                  ),
                   SizedBox(
-                    width: widthHeight,
-                    height: widthHeight,
-                    child: Center(child: Text("Achievement: $achCount"),)
-                  )
+                      width: widthHeight,
+                      height: widthHeight,
+                      child: Center(
+                        child: Text("Achievement: $achCount"),
+                      ))
                 ],
               ),
             ),
           ),
           SizedBox(
-            height: 365,
+            height: 470,
             width: 390,
             child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  mainAxisExtent: 115,
-                  maxCrossAxisExtent: 200, // максимальная ширина элемента
-                  crossAxisSpacing: 4, // расстояние между столбцами
+                  mainAxisExtent: 230,
+                  maxCrossAxisExtent: 130, // максимальная ширина элемента
+                  crossAxisSpacing: 3, // расстояние между столбцами
                   mainAxisSpacing: 10, // расстояние между строками
                 ),
                 itemCount: recent?.length, // количество элементов в гриде
