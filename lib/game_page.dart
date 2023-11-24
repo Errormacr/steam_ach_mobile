@@ -20,43 +20,44 @@ class _GamePageState extends State<GamePage> {
   @override
   void initState() {
     super.initState();
-    
+
     const secureStorage = FlutterSecureStorage();
     secureStorage.read(key: "steamId").then((steamId) {
-    db.getUserById(int.tryParse(steamId!)).then((user) {
-      if (user != null) {
-        List<classes.Game> games = user.games;
-        games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
-        List<GameCard> gameCards = [];
-        for (var i = 0; i < games.length; i++) {
-          String gameName = games[i].name!.trim();
-          List<classes.Achievement> ach = games[i].achievements!;
-          int achCount = ach.length;
-          Iterable<classes.Achievement> achievedAch =
-              ach.where((element) => element.achieved);
-          int gainedCount = achievedAch.length;
-          int? parsedAchCount = int.tryParse(achCount.toString());
-          if (parsedAchCount == null) {
-            gainedCount = 0;
-            achCount = 0;
+      db.getUserById(int.tryParse(steamId!)).then((user) {
+        if (user != null) {
+          List<classes.Game> games = user.games;
+          games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
+          List<GameCard> gameCards = [];
+          for (var i = 0; i < games.length; i++) {
+            String gameName = games[i].name!.trim();
+            List<classes.Achievement> ach = games[i].achievements!;
+            int achCount = ach.length;
+            Iterable<classes.Achievement> achievedAch =
+                ach.where((element) => element.achieved);
+            int gainedCount = achievedAch.length;
+            int? parsedAchCount = int.tryParse(achCount.toString());
+            if (parsedAchCount == null) {
+              gainedCount = 0;
+              achCount = 0;
+            }
+            gameCards.add(GameCard(
+              gameName: gameName,
+              isCompleted: achCount == gainedCount && achCount != 0,
+              achievementCount: achCount,
+              gainedCount: gainedCount,
+              playtime: games[i].playtimeForever!,
+              lastPlayTime: games[i].lastPlayTime!,
+              appid: games[i].appid!,
+            ));
           }
-          gameCards.add(GameCard(
-            gameName: gameName,
-            isCompleted: achCount == gainedCount && achCount != 0,
-            achievementCount: achCount,
-            gainedCount: gainedCount,
-            playtime: games[i].playtimeForever!,
-            lastPlayTime: games[i].lastPlayTime!,
-            appid: games[i].appid!,
-          ));
-        }
 
-        setState(() {
-          cards = gameCards;
-        });
-      }
-    }); // You can call the method here or in another appropriate lifecycle method
- }); }
+          setState(() {
+            cards = gameCards;
+          });
+        }
+      }); // You can call the method here or in another appropriate lifecycle method
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,37 +170,43 @@ class _GamePageState extends State<GamePage> {
                 );
               }).toList(),
             ),
-            SizedBox(width: 40,child:  ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  selectDirection = selectDirection == "Ascending" ? "dec" : "Ascending";
-                });
-                sorting();
-              },
-               style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 10,)
-                      ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Icon(
-                    selectDirection == "Ascending"
-                        ? Icons.arrow_upward
-                        : Icons.arrow_downward,
-                    size: 20,
-                  ),
-                ],
+            SizedBox(
+              width: 40,
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    selectDirection =
+                        selectDirection == "Ascending" ? "dec" : "Ascending";
+                  });
+                  sorting();
+                },
+                style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                )),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Icon(
+                      selectDirection == "Ascending"
+                          ? Icons.arrow_upward
+                          : Icons.arrow_downward,
+                      size: 20,
+                    ),
+                  ],
+                ),
               ),
             )
-         ,)
-            ],
+          ],
         ),
-        Expanded(
+        SizedBox(
+          height: 690,
+          width: 380,
           // Changed SingleChildScrollView to Expanded
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
               mainAxisExtent: 230,
-              maxCrossAxisExtent: 140, // максимальная ширина элемента
+              maxCrossAxisExtent: 130, // максимальная ширина элемента
               crossAxisSpacing: 3, // расстояние между столбцами
               mainAxisSpacing: 10, // расстояние между строками
             ),

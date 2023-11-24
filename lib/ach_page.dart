@@ -349,7 +349,11 @@ class _AllAchState extends State<AllAch> {
                 ))
           ],
         ),
-        Expanded(
+        Center(
+              child: SizedBox(
+                height: 630,
+                width: 380,
+
           // Changed SingleChildScrollView to Expanded
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -363,7 +367,7 @@ class _AllAchState extends State<AllAch> {
               return achs[index];
             },
           ),
-        )
+        ))
       ],
     );
   }
