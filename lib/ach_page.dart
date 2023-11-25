@@ -116,26 +116,26 @@ class _AllAchState extends State<AllAch> {
                 title: Text('Select percentage range'),
                 content: StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
-                    return 
-                    Column(
+                    return Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                    RangeSlider(
-                      
-                      values: currentRange,
-                      min: 0,
-                      max: 100,
-                      divisions: 100,
-                      labels: RangeLabels(
-                        currentRange.start.round().toString(),
-                        currentRange.end.round().toString(),
-                      ),
-                      onChanged: (RangeValues values) {
-                        setState(() {
-                          currentRange = values;
-                        });
-                      },
-                    )],);
+                        RangeSlider(
+                          values: currentRange,
+                          min: 0,
+                          max: 100,
+                          divisions: 100,
+                          labels: RangeLabels(
+                            currentRange.start.round().toString(),
+                            currentRange.end.round().toString(),
+                          ),
+                          onChanged: (RangeValues values) {
+                            setState(() {
+                              currentRange = values;
+                            });
+                          },
+                        )
+                      ],
+                    );
                   },
                 ),
                 actions: [
@@ -171,10 +171,10 @@ class _AllAchState extends State<AllAch> {
           }
 
           double latestAchievementDateInUnixEpoch = maxValue.toDouble();
-        
+
           RangeValues currentDateRange = RangeValues(
-            earliestAchievementDateInUnixEpoch, 
-            latestAchievementDateInUnixEpoch, 
+            earliestAchievementDateInUnixEpoch,
+            latestAchievementDateInUnixEpoch,
           );
           showDialog(
             context: context,
@@ -201,11 +201,10 @@ class _AllAchState extends State<AllAch> {
                           children: [
                             Text(
                               DateFormat('yyyy-MM-dd').format(
-                                currentDateRange.start.toInt().toUnixTime()
-                              ),
+                                  currentDateRange.start.toInt().toUnixTime()),
                             ),
                             Text(DateFormat('yyyy-MM-dd').format(
-                                currentDateRange.end.toInt().toUnixTime(),
+                              currentDateRange.end.toInt().toUnixTime(),
                             )),
                           ],
                         ),
@@ -333,8 +332,9 @@ class _AllAchState extends State<AllAch> {
                     sorting();
                   },
                   style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 10,)
-                      ),
+                      padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                  )),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -349,10 +349,9 @@ class _AllAchState extends State<AllAch> {
                 ))
           ],
         ),
-        Center(
-              child: SizedBox(
-                height: 630,
-                width: 380,
+        Expanded(
+            child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
 
           // Changed SingleChildScrollView to Expanded
           child: GridView.builder(

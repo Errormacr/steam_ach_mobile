@@ -350,26 +350,24 @@ class _GameAchState extends State<GameAch> {
                     ))
               ],
             ),
-            Center(
-              child: SizedBox(
-                height: 650,
-                width: 380,
-
-                // Changed SingleChildScrollView to Expanded
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    mainAxisExtent: 170,
-                    maxCrossAxisExtent: 130, // максимальная ширина элемента
-                    crossAxisSpacing: 10, // расстояние между столбцами
-                    mainAxisSpacing: 30, // расстояние между строками
-                  ),
-                  itemCount: achs.length, // количество элементов в гриде
-                  itemBuilder: (BuildContext context, int index) {
-                    return achs[index];
-                  },
+            Expanded(
+                child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child:
+                  // Changed SingleChildScrollView to Expanded
+                  GridView.builder(
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  mainAxisExtent: 170,
+                  maxCrossAxisExtent: 130, // максимальная ширина элемента
+                  crossAxisSpacing: 10, // расстояние между столбцами
+                  mainAxisSpacing: 30, // расстояние между строками
                 ),
+                itemCount: achs.length, // количество элементов в гриде
+                itemBuilder: (BuildContext context, int index) {
+                  return achs[index];
+                },
               ),
-            )
+            ))
           ],
         ));
   }

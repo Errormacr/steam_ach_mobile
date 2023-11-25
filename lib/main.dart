@@ -141,7 +141,6 @@ class _MyHomePageState extends State<MyHomePage> {
     int steamId = int.tryParse(value)!;
     api.checkUpdate(steamId).then((url) {
       if (!url) {
-        print("error here");
         api.getUserData(steamId, lang).then((ele) {
           classes.Account? user = ele;
           if (user != null) {

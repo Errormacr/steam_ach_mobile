@@ -199,23 +199,24 @@ class _GamePageState extends State<GamePage> {
             )
           ],
         ),
-        SizedBox(
-          height: 690,
-          width: 380,
-          // Changed SingleChildScrollView to Expanded
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              mainAxisExtent: 230,
-              maxCrossAxisExtent: 130, // максимальная ширина элемента
-              crossAxisSpacing: 3, // расстояние между столбцами
-              mainAxisSpacing: 10, // расстояние между строками
-            ),
-            itemCount: cards.length, // количество элементов в гриде
-            itemBuilder: (BuildContext context, int index) {
-              return cards[index];
-            },
-          ),
-        )
+            Expanded(
+
+                // Changed SingleChildScrollView to Expanded
+                child: Padding(
+                   padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  mainAxisExtent: 230,
+                  maxCrossAxisExtent: 130, // максимальная ширина элемента
+                  crossAxisSpacing: 3, // расстояние между столбцами
+                  mainAxisSpacing: 10, // расстояние между строками
+                ),
+                itemCount: cards.length, // количество элементов в гриде
+                itemBuilder: (BuildContext context, int index) {
+                  return cards[index];
+                },
+              ),
+            )),
       ],
     );
   }
