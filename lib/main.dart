@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -144,8 +146,6 @@ class _MyHomePageState extends State<MyHomePage> {
         api.getUserData(steamId, lang).then((ele) {
           classes.Account? user = ele;
           if (user != null) {
-            print(user.gameCount);
-
             List<classes.Game> games = user.games;
             games.sort((a, b) => b.lastPlayTime! - a.lastPlayTime!);
             List<GameCard> gameCards = [];
@@ -166,13 +166,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 appid: games[i].appid!,
               ));
             }
-            print(user.avaUrl);
-            print(user.username);
-            print(user.gameCount);
-            print(user.percentage);
-            print(user.achievementCount);
-            print(steamId);
-            print(gameCards);
             setState(() {
               avatarUrl = user.avaUrl;
               nickname = user.username;
@@ -246,7 +239,26 @@ class _MyHomePageState extends State<MyHomePage> {
         toolbarHeight: 20,
         title: const Text('Steam Avatar'),
       ),
-      body: pages[_currentIndex],
+      body: GestureDetector(
+        onHorizontalDragEnd: (details) {
+          print(details.primaryVelocity);
+          if (_currentIndex > 0 &&
+              details.primaryVelocity != null &&
+              details.primaryVelocity! > 0) {
+            setState(() {
+              _currentIndex = _currentIndex - 1;
+            });
+          }
+          if (_currentIndex < 3 &&
+              details.primaryVelocity != null &&
+              details.primaryVelocity! < 0) {
+            setState(() {
+              _currentIndex = _currentIndex + 1;
+            });
+          }
+        },
+        child: pages[_currentIndex],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (int index) {

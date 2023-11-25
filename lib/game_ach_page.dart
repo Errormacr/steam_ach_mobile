@@ -127,12 +127,12 @@ class _GameAchState extends State<GameAch> {
               achsStorage.where((element) => !element.achieved).toList());
           break;
         case 'percents':
-          RangeValues currentRange = RangeValues(0, 100);
+          RangeValues currentRange = const RangeValues(0, 100);
           showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text('Select percentage range'),
+                title: const Text('Select percentage range'),
                 content: StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
                     return Column(mainAxisSize: MainAxisSize.min, children: [
@@ -167,7 +167,7 @@ class _GameAchState extends State<GameAch> {
                       replaceAchs(filteredAchs);
                       Navigator.of(context).pop();
                     },
-                    child: Text('Apply'),
+                    child: const Text('Apply'),
                   ),
                 ],
               );
@@ -241,7 +241,7 @@ class _GameAchState extends State<GameAch> {
                       replaceAchs(filteredAchs);
                       Navigator.of(context).pop();
                     },
-                    child: Text('Apply'),
+                    child: const Text('Apply'),
                   ),
                 ],
               );

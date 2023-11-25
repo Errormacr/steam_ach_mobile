@@ -108,12 +108,12 @@ class _AllAchState extends State<AllAch> {
           replaceAchs(achsStorage);
           break;
         case 'percents':
-          RangeValues currentRange = RangeValues(0, 100);
+          RangeValues currentRange = const RangeValues(0, 100);
           showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text('Select percentage range'),
+                title: const Text('Select percentage range'),
                 content: StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
                     return Column(
@@ -151,7 +151,7 @@ class _AllAchState extends State<AllAch> {
                       replaceAchs(filteredAchs);
                       Navigator.of(context).pop();
                     },
-                    child: Text('Apply'),
+                    child: const Text('Apply'),
                   ),
                 ],
               );
@@ -225,7 +225,7 @@ class _AllAchState extends State<AllAch> {
                       replaceAchs(filteredAchs);
                       Navigator.of(context).pop();
                     },
-                    child: Text('Apply'),
+                    child: const Text('Apply'),
                   ),
                 ],
               );
