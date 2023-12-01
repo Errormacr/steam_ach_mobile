@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -28,6 +26,7 @@ Future<void> fetchData(BuildContext context) async {
     storedData = (await secureStorage.read(key: "apiKey"))!;
     steamId = (await secureStorage.read(key: "steamId"))!;
   } catch (e) {
+    // ignore: avoid_print
     print(e);
   }
   if (steamId.trim() == "" || storedData.trim() == "") {
@@ -77,6 +76,7 @@ Future<void> fetchData(BuildContext context) async {
                 }
                 if (steamId.trim() == "") {
                   await secureStorage.write(key: "steamId", value: newSteamId);
+                  // ignore: use_build_context_synchronously
                   Navigator.of(context).pop(newSteamId);
                 }
               },
@@ -131,10 +131,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   initState() {
     super.initState();
-    reinit();
+    reInit();
   }
 
-  Future<void> reinit() async {
+  Future<void> reInit() async {
     const secureStorage = FlutterSecureStorage();
     const String lang = "Russian";
     String apiKey = (await secureStorage.read(key: "apiKey"))!;
@@ -152,9 +152,9 @@ class _MyHomePageState extends State<MyHomePage> {
             for (var i = 0; i < 6; i++) {
               List<classes.Achievement> ach = games[i].achievements!;
               int achCount = ach.length;
-              Iterable<classes.Achievement> achi =
+              Iterable<classes.Achievement> achievedAch =
                   ach.where((element) => element.achieved);
-              int gainedCount = achi.length;
+              int gainedCount = achievedAch.length;
               String gameName = games[i].name!.trim();
               gameCards.add(GameCard(
                 gameName: gameName,
@@ -187,9 +187,9 @@ class _MyHomePageState extends State<MyHomePage> {
             for (var i = 0; i < 6; i++) {
               List<classes.Achievement> ach = games[i].achievements!;
               int achCount = ach.length;
-              Iterable<classes.Achievement> achi =
+              Iterable<classes.Achievement> achievedAch =
                   ach.where((element) => element.achieved);
-              int gainedCount = achi.length;
+              int gainedCount = achievedAch.length;
               String gameName = games[i].name!.trim();
               gameCards.add(GameCard(
                 gameName: gameName,
@@ -219,6 +219,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final PageController pageController = PageController();
     final List<Widget> pages = [
       HomePage(
         nickname: nickname,
@@ -241,33 +242,41 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: GestureDetector(
         onHorizontalDragEnd: (details) {
-          print(details.primaryVelocity);
-          if (_currentIndex > 0 &&
-              details.primaryVelocity != null &&
-              details.primaryVelocity! > 0) {
-            setState(() {
-              _currentIndex = _currentIndex - 1;
-            });
-          }
-          if (_currentIndex < 3 &&
-              details.primaryVelocity != null &&
-              details.primaryVelocity! < 0) {
-            setState(() {
-              _currentIndex = _currentIndex + 1;
-            });
+          if (details.primaryVelocity != null) {
+            if (details.primaryVelocity! > 0) {
+              // Переход к предыдущей странице
+              pageController.previousPage(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            } else {
+              // Переход к следующей странице
+              pageController.nextPage(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            }
           }
         },
-        child: pages[_currentIndex],
+        child: PageView(
+          controller: pageController,
+          children: pages,
+          onPageChanged: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (int index) {
-          if (index == 0) {
-            reinit();
-          }
-          setState(() {
-            _currentIndex = index;
-          });
+          // Переход к выбранной странице
+          pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
         },
         selectedItemColor: Colors.grey, // Цвет выбранного элемента
         unselectedItemColor: Colors.white, //

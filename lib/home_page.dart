@@ -24,6 +24,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+     double screenWidth = MediaQuery.of(context).size.width;
     return Center(
       child: Wrap(
         direction: Axis.vertical,
@@ -89,8 +90,11 @@ class HomePage extends StatelessWidget {
           ),
           SizedBox(
             height: 470,
-            width: 380,
-            child: GridView.builder(
+            width: screenWidth,
+            child: Padding(
+                   padding: const EdgeInsets.symmetric(horizontal: 10),
+              child:
+             GridView.builder(
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                   mainAxisExtent: 230,
                   maxCrossAxisExtent: 130, // максимальная ширина элемента
@@ -101,7 +105,7 @@ class HomePage extends StatelessWidget {
                 itemBuilder: (BuildContext context, int index) {
                   return recent?[index];
                 }),
-          ),
+          )),
         ],
       ),
     );
