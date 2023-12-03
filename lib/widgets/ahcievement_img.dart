@@ -19,26 +19,58 @@ class Achievement extends StatelessWidget {
     required this.percentage,
     required this.dateOfAch,
     required this.achieved,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    List<Color> getColor(double percentage) {
+      if (percentage < 5) {
+        return [
+          const Color.fromARGB(255, 244, 193, 54),
+          const Color.fromARGB(255, 255, 0, 255)
+        ];
+      } else if (percentage < 20) {
+        return [
+          const Color.fromARGB(255, 255, 0, 255),
+          const Color.fromARGB(255, 59, 150, 255)
+        ];
+      } else if (percentage < 50) {
+        return [const Color.fromARGB(255, 59, 150, 255), Colors.lightGreen];
+      } else if (percentage < 80) {
+        return [Colors.lightGreen, Colors.green];
+      } else {
+        return [Colors.green, const Color.fromARGB(255, 11, 61, 13)];
+      }
+    }
+
+    double getStop(double percentage) {
+      if (percentage < 5) {
+        return 1.0 - percentage / 5;
+      } else if (percentage < 20) {
+        return 1.0 - (percentage - 5) / (20 - 5);
+      } else if (percentage < 50) {
+        return 1.0 - (percentage - 20) / (50 - 20);
+      } else if (percentage < 80) {
+        return 1.0 - (percentage - 50) / (80 - 50);
+      } else {
+        return 1.0 - (percentage - 80) / (100 - 80);
+      }
+    }
+
     return Container(
       width: 150,
       height: 100,
       decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
-        boxShadow: [
+        borderRadius: BorderRadius.circular(10),
+        gradient: LinearGradient(
+          stops:  [getStop(percentage), 1.0],
+          colors: getColor(percentage),
+        ),
+        boxShadow: const [
           BoxShadow(
-            color: percentage < 5
-                ? const Color.fromARGB(110, 255, 184, 78)
-                : percentage < 20
-                    ? const Color.fromARGB(110, 217, 0, 255)
-                    : percentage < 45
-                        ? const Color.fromARGB(110, 60, 0, 255)
-                        : percentage < 60
-                            ? const Color.fromARGB(110, 43, 160, 1)
-                            : const Color.fromARGB(110, 60, 255, 0),
+            color: Colors.black26,
+            offset: Offset(0, 2),
+            blurRadius: 4,
           ),
         ],
       ),
@@ -47,8 +79,12 @@ class Achievement extends StatelessWidget {
           Container(
             width: 45,
             height: 45,
-            decoration: const BoxDecoration(
-              shape: BoxShape.rectangle,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white,
+                width: 2,
+              ),
             ),
             child: CachedNetworkImage(
               imageUrl: imgUrl,
@@ -57,10 +93,10 @@ class Achievement extends StatelessWidget {
                   Image.asset('assets/image/noAch.svg'),
               width: 45,
               height: 45,
-              fit: BoxFit.contain,
+              fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(height: 10),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,18 +105,21 @@ class Achievement extends StatelessWidget {
                 achievementName,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 5),
               Text(
                 '${percentage.toStringAsFixed(2)}%',
-                style: const TextStyle(fontSize: 14),
+                style: const TextStyle(fontSize: 14, color: Colors.white),
               ),
               const SizedBox(height: 5),
               Text(
-                '${DateFormat('yyyy-MM-dd hh').format(dateOfAch.toUnixTime())}',
-                style: const TextStyle(fontSize: 14),
+                DateFormat('MMM dd, yyyy').format(dateOfAch.toUnixTime()),
+                style: const TextStyle(fontSize: 14, color: Colors.white),
               ),
             ],
           ),

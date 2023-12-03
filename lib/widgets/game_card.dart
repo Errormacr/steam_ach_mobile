@@ -46,7 +46,7 @@ class GameCard extends StatelessWidget {
                   top: 0,
                   child: Container(
                     width: 120,
-                    height: 90,
+                    height: 120,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(0),
                       border: Border.all(
