@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:GamersGlint/widgets/ahcievement_img.dart';
+import 'package:sticky_headers/sticky_headers/widget.dart';
 import 'API/db_methods.dart';
 import 'package:intl/intl.dart';
 import 'package:unixtime/unixtime.dart';
@@ -16,6 +17,8 @@ class _AllAchState extends State<AllAch> {
   String selectedSort = "Achieved time";
   String selectedFilter = "FilterAch";
   String selectDirection = "DESC";
+  final ScrollController _scrollController = ScrollController();
+  int visibleContainerIndex = 0;
   String nameSearchQuery = "";
   String gameSearchQuery = "";
   List<Achievement> achs = [];
@@ -55,6 +58,13 @@ class _AllAchState extends State<AllAch> {
             achsStorage = achImgs;
           });
         }
+      });
+    });
+    _scrollController.addListener(() {
+      setState(() {
+        // Определите видимый контейнер по позиции в списке
+        visibleContainerIndex =
+            (_scrollController.offset / 155).floor().clamp(0, achs.length);
       });
     });
   }
@@ -351,23 +361,55 @@ class _AllAchState extends State<AllAch> {
         ),
         Expanded(
             child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
 
-          // Changed SingleChildScrollView to Expanded
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              mainAxisExtent: 170,
-              maxCrossAxisExtent: 140, // максимальная ширина элемента
-              crossAxisSpacing: 10, // расстояние между столбцами
-              mainAxisSpacing: 30, // расстояние между строками
-            ),
-            itemCount: achs.length, // количество элементов в гриде
-            itemBuilder: (BuildContext context, int index) {
-              return achs[index];
-            },
-          ),
-        ))
+                // Changed SingleChildScrollView to Expanded
+                child: ListView.builder(
+                    controller: _scrollController,
+                    itemBuilder: (context, index) {
+                      return StickyHeader(
+                        header: visibleContainerIndex == index || (index-1 == visibleContainerIndex && achs[index].gameName != achs[index-1].gameName) || (index+1 == visibleContainerIndex && achs[index].gameName != achs[index+1].gameName) 
+                            ? Container(
+                                height: 50.0,
+                                color: Colors.blueGrey[700],
+                                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  achs[index].gameName,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              )
+                            : Container(
+                                width: 0,
+                                height: 0,
+                              ),
+                        content: Container(
+                          height: 155,
+                          width: double.infinity,
+                          child: achs[index],
+                        ),
+                      );
+                    })
+                // GridView.builder(
+                //   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                //     mainAxisExtent: 170,
+                //     maxCrossAxisExtent: 140, // максимальная ширина элемента
+                //     crossAxisSpacing: 10, // расстояние между столбцами
+                //     mainAxisSpacing: 30, // расстояние между строками
+                //   ),
+                //   itemCount: achs.length, // количество элементов в гриде
+                //   itemBuilder: (BuildContext context, int index) {
+                //     return achs[index];
+                //   },
+                // ),
+                ))
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }
