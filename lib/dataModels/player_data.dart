@@ -42,11 +42,11 @@ class Player {
     String avatarfull;
     String avatarhash;
     int lastlogoff;
-    int personastate;
+    int? personastate;
     String primaryclanid;
     int timecreated;
-    int personastateflags;
-    String loccountrycode;
+    int? personastateflags;
+    String? loccountrycode;
 
     Player({
         required this.steamid,
@@ -60,11 +60,11 @@ class Player {
         required this.avatarfull,
         required this.avatarhash,
         required this.lastlogoff,
-        required this.personastate,
+        this.personastate,
         required this.primaryclanid,
         required this.timecreated,
-        required this.personastateflags,
-        required this.loccountrycode,
+        this.personastateflags,
+        this.loccountrycode,
     });
 
     factory Player.fromJson(Map<String, dynamic> json) => Player(
