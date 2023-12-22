@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:GamersGlint/widgets/ahcievement_img.dart';
-import 'package:sticky_headers/sticky_headers/widget.dart';
+import 'package:GamersGlint/widgets/flip_of_achievement.dart';
 import 'API/db_methods.dart';
 import 'package:intl/intl.dart';
 import 'package:unixtime/unixtime.dart';
@@ -10,6 +9,7 @@ class AllAch extends StatefulWidget {
   const AllAch({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _AllAchState createState() => _AllAchState();
 }
 
@@ -21,8 +21,8 @@ class _AllAchState extends State<AllAch> {
   int visibleContainerIndex = 0;
   String nameSearchQuery = "";
   String gameSearchQuery = "";
-  List<Achievement> achs = [];
-  List<Achievement> achsStorage = [];
+  List<Achievement> achievements = [];
+  List<Achievement> achievementsStorage = [];
   Methods db = Methods();
   @override
   void initState() {
@@ -31,47 +31,41 @@ class _AllAchState extends State<AllAch> {
     secureStorage.read(key: "steamId").then((steamId) {
       db.getUserById(int.tryParse(steamId!)).then((user) {
         if (user != null) {
-          List<Achievement> achImgs = [];
+          List<Achievement> achImages = [];
           for (var game in user.games) {
             if (game.percent! > 0) {
               for (var ach in game.achievements!) {
                 if (ach.achieved) {
-                  int unlocktime = ach.dateOfAch!;
+                  int unlockTime = ach.dateOfAch!;
                   Achievement achImg = Achievement(
+                    description: ach.description!,
                     gameName: game.name!,
                     imgUrl: ach.icon!,
                     achievementName: ach.displayName!,
                     percentage: ach.percentage!,
-                    dateOfAch: unlocktime,
+                    dateOfAch: unlockTime,
                     achieved: ach.achieved,
                   );
-                  achImgs.add(achImg);
+                  achImages.add(achImg);
                 }
               }
             }
           }
-          achImgs.sort((a, b) {
+          achImages.sort((a, b) {
             return b.dateOfAch - a.dateOfAch;
           });
           setState(() {
-            achs = achImgs;
-            achsStorage = achImgs;
+            achievements = achImages;
+            achievementsStorage = achImages;
           });
         }
       });
     });
-    _scrollController.addListener(() {
-      setState(() {
-        // Определите видимый контейнер по позиции в списке
-        visibleContainerIndex =
-            (_scrollController.offset / 155).floor().clamp(0, achs.length);
-      });
-    });
   }
 
-  void replaceAchs(List<Achievement> listAchievement) {
+  void replaceAchievements(List<Achievement> listAchievement) {
     setState(() {
-      achs = listAchievement;
+      achievements = listAchievement;
     });
   }
 
@@ -81,26 +75,26 @@ class _AllAchState extends State<AllAch> {
       setState(() {
         switch (selectedSort) {
           case 'Achieved time':
-            achs.sort((a, b) => selectDirection == 'ASC'
+            achievements.sort((a, b) => selectDirection == 'ASC'
                 ? a.dateOfAch.compareTo(b.dateOfAch)
                 : b.dateOfAch.compareTo(a.dateOfAch));
             break;
           case 'Percent':
-            achs.sort((a, b) {
+            achievements.sort((a, b) {
               return selectDirection == 'ASC'
                   ? a.percentage.compareTo(b.percentage)
                   : b.percentage.compareTo(a.percentage);
             });
             break;
           case 'Name':
-            achs.sort((a, b) {
+            achievements.sort((a, b) {
               return selectDirection == 'ASC'
                   ? b.achievementName.compareTo(a.achievementName)
                   : a.achievementName.compareTo(b.achievementName);
             });
             break;
           case 'GameName':
-            achs.sort((a, b) {
+            achievements.sort((a, b) {
               return selectDirection == 'ASC'
                   ? b.gameName.compareTo(a.gameName)
                   : a.gameName.compareTo(b.gameName);
@@ -115,7 +109,7 @@ class _AllAchState extends State<AllAch> {
     void filter() {
       switch (selectedFilter) {
         case 'FilterAch':
-          replaceAchs(achsStorage);
+          replaceAchievements(achievementsStorage);
           break;
         case 'percents':
           RangeValues currentRange = const RangeValues(0, 100);
@@ -151,14 +145,13 @@ class _AllAchState extends State<AllAch> {
                 actions: [
                   ElevatedButton(
                     onPressed: () {
-                      // Обработка выбора диапазона процентов
-                      // Например, фильтрация списка achs по выбранному диапазону
-                      List<Achievement> filteredAchs = achsStorage
-                          .where((ach) =>
-                              ach.percentage >= currentRange.start &&
-                              ach.percentage <= currentRange.end)
-                          .toList();
-                      replaceAchs(filteredAchs);
+                      List<Achievement> filteredAchievements =
+                          achievementsStorage
+                              .where((ach) =>
+                                  ach.percentage >= currentRange.start &&
+                                  ach.percentage <= currentRange.end)
+                              .toList();
+                      replaceAchievements(filteredAchievements);
                       Navigator.of(context).pop();
                     },
                     child: const Text('Apply'),
@@ -169,14 +162,14 @@ class _AllAchState extends State<AllAch> {
           );
           break;
         case "data":
-          double earliestAchievementDateInUnixEpoch = achsStorage
+          double earliestAchievementDateInUnixEpoch = achievementsStorage
               .map((ach) => ach.dateOfAch)
               .reduce((a, b) => a < b ? a : b)
               .toDouble();
-          int maxValue = achsStorage[0].dateOfAch;
-          for (int i = 1; i < achsStorage.length; i++) {
-            if (achsStorage[i].dateOfAch > maxValue) {
-              maxValue = achsStorage[i].dateOfAch;
+          int maxValue = achievementsStorage[0].dateOfAch;
+          for (int i = 1; i < achievementsStorage.length; i++) {
+            if (achievementsStorage[i].dateOfAch > maxValue) {
+              maxValue = achievementsStorage[i].dateOfAch;
             }
           }
 
@@ -225,14 +218,13 @@ class _AllAchState extends State<AllAch> {
                 actions: [
                   ElevatedButton(
                     onPressed: () {
-                      // Обработка выбора диапазона дат
-                      // Например, фильтрация списка achs по выбранному диапазону дат
-                      List<Achievement> filteredAchs = achsStorage
-                          .where((ach) =>
-                              ach.dateOfAch >= currentDateRange.start &&
-                              ach.dateOfAch <= currentDateRange.end)
-                          .toList();
-                      replaceAchs(filteredAchs);
+                      List<Achievement> filteredAchievements =
+                          achievementsStorage
+                              .where((ach) =>
+                                  ach.dateOfAch >= currentDateRange.start &&
+                                  ach.dateOfAch <= currentDateRange.end)
+                              .toList();
+                      replaceAchievements(filteredAchievements);
                       Navigator.of(context).pop();
                     },
                     child: const Text('Apply'),
@@ -261,7 +253,7 @@ class _AllAchState extends State<AllAch> {
                   setState(() {
                     nameSearchQuery = value;
                   });
-                  replaceAchs(achsStorage
+                  replaceAchievements(achievementsStorage
                       .where((ach) => ach.achievementName
                           .toLowerCase()
                           .contains(nameSearchQuery.toLowerCase()))
@@ -280,7 +272,7 @@ class _AllAchState extends State<AllAch> {
                   setState(() {
                     gameSearchQuery = value;
                   });
-                  replaceAchs(achsStorage
+                  replaceAchievements(achievementsStorage
                       .where((ach) => ach.gameName
                           .toLowerCase()
                           .contains(gameSearchQuery.toLowerCase()))
@@ -361,48 +353,20 @@ class _AllAchState extends State<AllAch> {
         ),
         Expanded(
             child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-
-                // Changed SingleChildScrollView to Expanded
-                child: ListView.builder(
-                    controller: _scrollController,
-                    itemBuilder: (context, index) {
-                      return StickyHeader(
-                        header: visibleContainerIndex == index || (index-1 == visibleContainerIndex && achs[index].gameName != achs[index-1].gameName) || (index+1 == visibleContainerIndex && achs[index].gameName != achs[index+1].gameName) 
-                            ? Container(
-                                height: 50.0,
-                                color: Colors.blueGrey[700],
-                                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  achs[index].gameName,
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              )
-                            : Container(
-                                width: 0,
-                                height: 0,
-                              ),
-                        content: Container(
-                          height: 155,
-                          width: double.infinity,
-                          child: achs[index],
-                        ),
-                      );
-                    })
-                // GridView.builder(
-                //   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                //     mainAxisExtent: 170,
-                //     maxCrossAxisExtent: 140, // максимальная ширина элемента
-                //     crossAxisSpacing: 10, // расстояние между столбцами
-                //     mainAxisSpacing: 30, // расстояние между строками
-                //   ),
-                //   itemCount: achs.length, // количество элементов в гриде
-                //   itemBuilder: (BuildContext context, int index) {
-                //     return achs[index];
-                //   },
-                // ),
-                ))
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              mainAxisExtent: 170,
+              maxCrossAxisExtent: 140,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 30,
+            ),
+            itemCount: achievements.length,
+            itemBuilder: (BuildContext context, int index) {
+              return achievements[index];
+            },
+          ),
+        ))
       ],
     );
   }

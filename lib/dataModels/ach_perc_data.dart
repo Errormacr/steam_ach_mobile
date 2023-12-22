@@ -1,51 +1,54 @@
-class PercData {
-    Achievementpercentages achievementpercentages;
+class PercentageData {
+  Achievementpercentages achievementpercentages;
 
-    PercData({
-        required this.achievementpercentages,
-    });
+  PercentageData({
+    required this.achievementpercentages,
+  });
 
-    factory PercData.fromJson(Map<String, dynamic> json) => PercData(
-        achievementpercentages: Achievementpercentages.fromJson(json["achievementpercentages"]),
-    );
+  factory PercentageData.fromJson(Map<String, dynamic> json) => PercentageData(
+        achievementpercentages:
+            Achievementpercentages.fromJson(json["achievementpercentages"]),
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "achievementpercentages": achievementpercentages.toJson(),
-    };
+      };
 }
 
 class Achievementpercentages {
-    List<Achievement> achievements;
+  List<Achievement> achievements;
 
-    Achievementpercentages({
-        required this.achievements,
-    });
+  Achievementpercentages({
+    required this.achievements,
+  });
 
-    factory Achievementpercentages.fromJson(Map<String, dynamic> json) => Achievementpercentages(
-        achievements: List<Achievement>.from(json["achievements"].map((x) => Achievement.fromJson(x))),
-    );
+  factory Achievementpercentages.fromJson(Map<String, dynamic> json) =>
+      Achievementpercentages(
+        achievements: List<Achievement>.from(
+            json["achievements"].map((x) => Achievement.fromJson(x))),
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "achievements": List<dynamic>.from(achievements.map((x) => x.toJson())),
-    };
+      };
 }
 
 class Achievement {
-    String name;
-    double percent;
+  String name;
+  double percent;
 
-    Achievement({
-        required this.name,
-        required this.percent,
-    });
+  Achievement({
+    required this.name,
+    required this.percent,
+  });
 
-    factory Achievement.fromJson(Map<String, dynamic> json) => Achievement(
+  factory Achievement.fromJson(Map<String, dynamic> json) => Achievement(
         name: json["name"],
         percent: json["percent"]?.toDouble(),
-    );
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "name": name,
         "percent": percent,
-    };
+      };
 }

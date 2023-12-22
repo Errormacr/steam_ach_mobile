@@ -7,19 +7,17 @@ import './db_methods.dart';
 import '../dataModels/player_data.dart';
 import '../dataModels/game_data.dart' as gm;
 import '../dataModels/ach_data.dart' as ach_m;
-import '../dataModels/ach_perc_data.dart' as perc_m;
+import '../dataModels/ach_perc_data.dart' as percents_m;
 import '../dataModels/ach_ico_data.dart' as icon_m;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
-
-typedef GameDatarequest = ({gm.GameData gameDataSplit});
 
 Future<http.Response> fetchData(String url) {
   return http.get(Uri.parse(url));
 }
 
-class readyIsol {
-  readyIsol({
+class ReadyIso {
+  ReadyIso({
     required this.games,
     required this.achCount,
     required this.percents,
@@ -32,9 +30,9 @@ class readyIsol {
   double percents;
 }
 
-Future<readyIsol> getGameData(
+Future<ReadyIso> getGameData(
     (
-      List<gm.Game> splitedGame,
+      List<gm.Game> splicedGame,
       String apiKey,
       int steamId,
       String lang
@@ -42,20 +40,20 @@ Future<readyIsol> getGameData(
   int achCount = 0;
   double percents = 0;
   int gameWithAch = 0;
-  List<int> updatetgame = [];
+  List<int> updatedGame = [];
   List<classes.Game> games = [];
   await Future.forEach(data.$1, (game) async {
     final achievements = <classes.Achievement>[];
     final achUrl =
         "http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${game.appid}&key=${data.$2}&steamid=${data.$3}&l=${data.$4}";
-    final percUrl =
+    final percentageUrl =
         "http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=${game.appid}&format=json";
     final icoUrl =
         "https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${game.appid}&key=${data.$2}&l=${data.$4}";
 
     final responsesAch = await Future.wait([
       http.get(Uri.parse(achUrl)),
-      http.get(Uri.parse(percUrl)),
+      http.get(Uri.parse(percentageUrl)),
       http.get(Uri.parse(icoUrl)),
     ]);
 
@@ -65,20 +63,21 @@ Future<readyIsol> getGameData(
     int totalAch = 0;
     Iterable<classes.Achievement> achievedAch = [];
     if (jsonDecode(achResp.body).toString() !=
-            "{playerstats: {error: Requested app has no stats, success: false}}" &&
+            "{playerStats: {error: Requested app has no stats, success: false}}" &&
         jsonDecode(achResp.body).toString().contains("achievements")) {
       final achRes = ach_m.AchData.fromJson(jsonDecode(achResp.body));
-      final percRes = perc_m.PercData.fromJson(jsonDecode(perResp.body));
+      final percentageRes =
+          percents_m.PercentageData.fromJson(jsonDecode(perResp.body));
       final icoRes = icon_m.IconData.fromJson(jsonDecode(icoResp.body));
 
       for (var item in achRes.playerstats.achievements) {
-        perc_m.Achievement matchingItem;
+        percents_m.Achievement matchingItem;
         try {
-          matchingItem = percRes.achievementpercentages.achievements
+          matchingItem = percentageRes.achievementpercentages.achievements
               .firstWhere((element) => element.name == item.apiname);
         } catch (e) {
           matchingItem =
-              perc_m.Achievement.fromJson({"name": "", "percent": 1});
+              percents_m.Achievement.fromJson({"name": "", "percent": 1});
         }
 
         final matchingItem2 = icoRes.game.availableGameStats.achievements
@@ -92,19 +91,19 @@ Future<readyIsol> getGameData(
           ..icongray = matchingItem2.icongray
           ..achieved = item.achieved == 1 ? true : false
           ..percentage = matchingItem.percent
-          ..dateOfAch = item.unlocktime);
+          ..dateOfAch = item.unlocking);
       }
       totalAch = achievements.length;
-     
+
       achievedAch = achievements.where((item) => item.achieved == true);
       if (achievedAch.isNotEmpty) {
         achCount += achievedAch.length;
         percents += achievedAch.length / totalAch;
         gameWithAch++;
       }
-      updatetgame.add(game.appid);
+      updatedGame.add(game.appid);
     } else {
-      updatetgame.add(game.appid);
+      updatedGame.add(game.appid);
     }
 
     games.add(classes.Game()
@@ -117,7 +116,7 @@ Future<readyIsol> getGameData(
       ..achievements = achievements);
   });
 
-  return readyIsol(
+  return ReadyIso(
       games: games,
       achCount: achCount,
       percents: percents,
@@ -158,7 +157,6 @@ class Api {
         final nickname = userData.response.players[0].personaname;
         final numGames = gameData.response.gameCount;
         List<classes.Game> games = <classes.Game>[];
-
 
         int splitter = numGames ~/ 6;
         List<gm.Game> game1 = gameData.response.games.sublist(0, splitter);

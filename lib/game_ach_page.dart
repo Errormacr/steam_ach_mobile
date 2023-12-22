@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:GamersGlint/API/db_classes.dart';
-import 'package:GamersGlint/widgets/ahcievement_img.dart' as achImgLib;
+import 'package:GamersGlint/widgets/flip_of_achievement.dart' as achImgLib;
 import 'API/db_methods.dart';
 import 'package:intl/intl.dart';
 import 'package:unixtime/unixtime.dart';
@@ -39,6 +39,7 @@ class _GameAchState extends State<GameAch> {
           for (var ach in game.achievements!) {
             int unlocktime = ach.dateOfAch!;
             achImgLib.Achievement achImg = achImgLib.Achievement(
+              description: ach.description ?? "",
               gameName: game.name!,
               imgUrl: ach.achieved ? ach.icon! : ach.icongray!,
               achievementName: ach.displayName!,
@@ -358,11 +359,11 @@ class _GameAchState extends State<GameAch> {
                   GridView.builder(
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                   mainAxisExtent: 170,
-                  maxCrossAxisExtent: 130, // максимальная ширина элемента
-                  crossAxisSpacing: 10, // расстояние между столбцами
-                  mainAxisSpacing: 30, // расстояние между строками
+                  maxCrossAxisExtent: 130,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 30,
                 ),
-                itemCount: achs.length, // количество элементов в гриде
+                itemCount: achs.length,
                 itemBuilder: (BuildContext context, int index) {
                   return achs[index];
                 },
