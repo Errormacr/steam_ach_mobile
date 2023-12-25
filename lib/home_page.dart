@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:GamersGlint/widgets/game_card.dart';
+import 'package:gamers_glint/widgets/game_card.dart';
 import 'widgets/two_rad.dart';
 
 class HomePage extends StatelessWidget {
@@ -24,7 +24,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     double screenWidth = MediaQuery.of(context).size.width;
+    double screenWidth = MediaQuery.of(context).size.width;
     return Center(
       child: Wrap(
         direction: Axis.vertical,
@@ -89,23 +89,23 @@ class HomePage extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 470,
-            width: screenWidth,
-            child: Padding(
-                   padding: const EdgeInsets.symmetric(horizontal: 10),
-              child:
-             GridView.builder(
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  mainAxisExtent: 230,
-                  maxCrossAxisExtent: 130, // максимальная ширина элемента
-                  crossAxisSpacing: 3, // расстояние между столбцами
-                  mainAxisSpacing: 10, // расстояние между строками
-                ),
-                itemCount: recent?.length, // количество элементов в гриде
-                itemBuilder: (BuildContext context, int index) {
-                  return recent?[index];
-                }),
-          )),
+              height: 470,
+              width: screenWidth,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                      mainAxisExtent: 230,
+                      maxCrossAxisExtent: 130, // максимальная ширина элемента
+                      crossAxisSpacing: 3, // расстояние между столбцами
+                      mainAxisSpacing: 10, // расстояние между строками
+                    ),
+                    itemCount: recent?.length, // количество элементов в гриде
+                    itemBuilder: (BuildContext context, int index) {
+                      return recent?[index];
+                    }),
+              )),
         ],
       ),
     );

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:GamersGlint/API/db_methods.dart' as db_method;
+import 'package:gamers_glint/API/db_methods.dart' as db_method;
 import 'widgets/game_card.dart';
 import "API/db_classes.dart" as classes;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class GamePage extends StatefulWidget {
-  const GamePage({Key? key});
+  const GamePage({super.key});
 
   @override
-  _GamePageState createState() => _GamePageState();
+  State<GamePage> createState() {
+    return _GamePageState();
+  }
 }
 
 class _GamePageState extends State<GamePage> {
@@ -199,24 +201,24 @@ class _GamePageState extends State<GamePage> {
             )
           ],
         ),
-            Expanded(
+        Expanded(
 
-                // Changed SingleChildScrollView to Expanded
-                child: Padding(
-                   padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  mainAxisExtent: 230,
-                  maxCrossAxisExtent: 130, // максимальная ширина элемента
-                  crossAxisSpacing: 3, // расстояние между столбцами
-                  mainAxisSpacing: 10, // расстояние между строками
-                ),
-                itemCount: cards.length, // количество элементов в гриде
-                itemBuilder: (BuildContext context, int index) {
-                  return cards[index];
-                },
-              ),
-            )),
+            // Changed SingleChildScrollView to Expanded
+            child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              mainAxisExtent: 230,
+              maxCrossAxisExtent: 130, // максимальная ширина элемента
+              crossAxisSpacing: 3, // расстояние между столбцами
+              mainAxisSpacing: 10, // расстояние между строками
+            ),
+            itemCount: cards.length, // количество элементов в гриде
+            itemBuilder: (BuildContext context, int index) {
+              return cards[index];
+            },
+          ),
+        )),
       ],
     );
   }

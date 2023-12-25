@@ -15,7 +15,9 @@ class NestedRadialProgress extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _NestedRadialProgressState createState() => _NestedRadialProgressState();
+  State<NestedRadialProgress> createState() {
+    return _NestedRadialProgressState();
+  }
 }
 
 class _NestedRadialProgressState extends State<NestedRadialProgress>
@@ -28,7 +30,6 @@ class _NestedRadialProgressState extends State<NestedRadialProgress>
   @override
   void initState() {
     super.initState();
-    
 
     _animationController = AnimationController(
       vsync: this,
@@ -74,15 +75,15 @@ class _NestedRadialProgressState extends State<NestedRadialProgress>
               return RadialProgress(
                 progress: _bigProgressAnimation.value,
                 progressColor: Colors.blue,
-                strokeWidth: 7.0 *(height+width)/400,
+                strokeWidth: 7.0 * (height + width) / 400,
                 backgroundColor: Colors.grey,
               );
             },
           ),
         ),
         Positioned(
-          top: 12 * (height /200),
-          left: 12 * (width /200),
+          top: 12 * (height / 200),
+          left: 12 * (width / 200),
           child: SizedBox(
             width: width * 0.88,
             height: height * 0.88,
@@ -92,7 +93,7 @@ class _NestedRadialProgressState extends State<NestedRadialProgress>
                 return RadialProgress(
                   progress: _smallProgressAnimation.value,
                   progressColor: Colors.red,
-                  strokeWidth: 7.0*(height+width)/400,
+                  strokeWidth: 7.0 * (height + width) / 400,
                   backgroundColor: Colors.grey,
                 );
               },

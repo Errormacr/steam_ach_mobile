@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:GamersGlint/widgets/flip_of_achievement.dart';
+import 'package:gamers_glint/widgets/flip_of_achievement.dart';
 import 'API/db_methods.dart';
 import 'package:intl/intl.dart';
 import 'package:unixtime/unixtime.dart';
@@ -38,7 +38,7 @@ class _AllAchState extends State<AllAch> {
                 if (ach.achieved) {
                   int unlockTime = ach.dateOfAch!;
                   Achievement achImg = Achievement(
-                    description: ach.description!,
+                    description: ach.description ?? "",
                     gameName: game.name!,
                     imgUrl: ach.icon!,
                     achievementName: ach.displayName!,

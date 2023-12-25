@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:GamersGlint/game_ach_page.dart';
+import 'package:gamers_glint/game_ach_page.dart';
 
 class GameCard extends StatelessWidget {
   final String gameName;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:GamersGlint/API/db_classes.dart';
-import 'package:GamersGlint/widgets/flip_of_achievement.dart' as achImgLib;
+import 'package:gamers_glint/API/db_classes.dart';
+import 'package:gamers_glint/widgets/flip_of_achievement.dart' as ach_img_lib;
 import 'API/db_methods.dart';
 import 'package:intl/intl.dart';
 import 'package:unixtime/unixtime.dart';
@@ -12,7 +12,9 @@ class GameAch extends StatefulWidget {
   const GameAch({Key? key, required this.gameAppid}) : super(key: key);
 
   @override
-  _GameAchState createState() => _GameAchState();
+  State<GameAch> createState() {
+    return _GameAchState();
+  }
 }
 
 class _GameAchState extends State<GameAch> {
@@ -22,8 +24,8 @@ class _GameAchState extends State<GameAch> {
   String nameSearchQuery = "";
   String gameSearchQuery = "";
   String gameName = "";
-  List<achImgLib.Achievement> achs = [];
-  List<achImgLib.Achievement> achsStorage = [];
+  List<ach_img_lib.Achievement> achs = [];
+  List<ach_img_lib.Achievement> achsStorage = [];
   Methods db = Methods();
   @override
   void initState() {
@@ -32,13 +34,13 @@ class _GameAchState extends State<GameAch> {
     secureStorage.read(key: "steamId").then((steamId) {
       db.getUserById(int.tryParse(steamId!)).then((user) {
         if (user != null) {
-          List<achImgLib.Achievement> achImgs = [];
+          List<ach_img_lib.Achievement> achImgs = [];
           Game game =
               user.games.firstWhere((game) => game.appid == widget.gameAppid);
           gameName = game.name!;
           for (var ach in game.achievements!) {
             int unlocktime = ach.dateOfAch!;
-            achImgLib.Achievement achImg = achImgLib.Achievement(
+            ach_img_lib.Achievement achImg = ach_img_lib.Achievement(
               description: ach.description ?? "",
               gameName: game.name!,
               imgUrl: ach.achieved ? ach.icon! : ach.icongray!,
@@ -62,7 +64,7 @@ class _GameAchState extends State<GameAch> {
     });
   }
 
-  void replaceAchs(List<achImgLib.Achievement> listAchievement) {
+  void replaceAchs(List<ach_img_lib.Achievement> listAchievement) {
     setState(() {
       achs = listAchievement;
     });
@@ -160,7 +162,7 @@ class _GameAchState extends State<GameAch> {
                     onPressed: () {
                       // Обработка выбора диапазона процентов
                       // Например, фильтрация списка achs по выбранному диапазону
-                      List<achImgLib.Achievement> filteredAchs = achsStorage
+                      List<ach_img_lib.Achievement> filteredAchs = achsStorage
                           .where((ach) =>
                               ach.percentage >= currentRange.start &&
                               ach.percentage <= currentRange.end)
@@ -234,7 +236,7 @@ class _GameAchState extends State<GameAch> {
                     onPressed: () {
                       // Обработка выбора диапазона дат
                       // Например, фильтрация списка achs по выбранному диапазону дат
-                      List<achImgLib.Achievement> filteredAchs = achsStorage
+                      List<ach_img_lib.Achievement> filteredAchs = achsStorage
                           .where((ach) =>
                               ach.dateOfAch >= currentDateRange.start &&
                               ach.dateOfAch <= currentDateRange.end)

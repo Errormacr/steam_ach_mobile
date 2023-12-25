@@ -1,4 +1,4 @@
-import 'package:GamersGlint/widgets/achievement_description.dart';
+import 'package:gamers_glint/widgets/achievement_description.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 

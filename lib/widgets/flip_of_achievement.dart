@@ -23,7 +23,9 @@ class Achievement extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _AchievementState createState() => _AchievementState();
+  State<Achievement> createState() {
+    return _AchievementState();
+  }
 }
 
 class _AchievementState extends State<Achievement>
@@ -36,7 +38,7 @@ class _AchievementState extends State<Achievement>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
     );
   }
 

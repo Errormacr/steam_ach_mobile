@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:http/http.dart' as http;
-import 'package:GamersGlint/API/db_classes.dart' as classes;
+import 'package:gamers_glint/API/db_classes.dart' as classes;
 import 'dart:convert';
 import './db_methods.dart';
 import '../dataModels/player_data.dart';

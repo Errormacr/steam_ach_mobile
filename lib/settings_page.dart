@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:GamersGlint/API/api.dart';
+import 'package:gamers_glint/API/api.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  State<SettingsPage> createState() {
+    return _SettingsPageState();
+  }
 }
 
 class _SettingsPageState extends State<SettingsPage> {
@@ -40,12 +42,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     TextButton(
                       child: const Text("OK"),
-                      onPressed: () async {
+                      onPressed: () {
                         final newApiKey = _apiKeyController.text;
                         const secureStorage = FlutterSecureStorage();
-                        await secureStorage.write(
-                            key: "apiKey", value: newApiKey);
-                        Navigator.of(context).pop();
+                        secureStorage
+                            .write(key: "apiKey", value: newApiKey)
+                            .then((value) => {Navigator.of(context).pop()});
                       },
                     ),
                   ],
@@ -76,12 +78,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     TextButton(
                       child: const Text("OK"),
-                      onPressed: () async {
+                      onPressed: () {
                         final newSteamId = _steamIdController.text;
                         const secureStorage = FlutterSecureStorage();
-                        await secureStorage.write(
-                            key: "steamId", value: newSteamId);
-                        Navigator.of(context).pop();
+                        secureStorage
+                            .write(key: "steamId", value: newSteamId)
+                            .then((value) => {Navigator.of(context).pop()});
                       },
                     ),
                   ],
@@ -94,13 +96,12 @@ class _SettingsPageState extends State<SettingsPage> {
         ElevatedButton(
             onPressed: () {
               const String lang = "Russian";
-              final secureStorage = FlutterSecureStorage();
+              const secureStorage = FlutterSecureStorage();
               secureStorage.read(key: "apiKey").then((apiKey) {
                 secureStorage.read(key: "steamId").then((value) {
                   Api api = Api(apiKey: apiKey!);
                   int steamId = int.tryParse(value!)!;
-                  print(apiKey + ": " +steamId.toString());
-                  
+
                   api.getUserData(steamId, lang).then((userData) {
                     showDialog(
                       context: context,

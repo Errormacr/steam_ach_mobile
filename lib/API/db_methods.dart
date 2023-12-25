@@ -1,6 +1,6 @@
 import 'package:path_provider/path_provider.dart';
 import 'package:isar/isar.dart';
-import 'package:GamersGlint/API/db_classes.dart';
+import 'package:gamers_glint/API/db_classes.dart';
 
 class Database {
   Future<Isar> open() async {
@@ -22,7 +22,7 @@ class Methods {
     Database db = Database();
     final isar = await db.open();
     isar.writeTxn(() => isar.accounts.put(user));
-  
+
     await db.close(isar);
   }
 
